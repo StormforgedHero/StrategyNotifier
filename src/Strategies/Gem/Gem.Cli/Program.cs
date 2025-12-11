@@ -1,7 +1,5 @@
-﻿using Gem.Cli.IO;
-using Gem.Domain.Core;
-using Gem.Domain.Engine;
-using Gem.Domain.Model;
+﻿using Gem.Cli.Configuration;
+using Gem.Cli.Execution;
 
 namespace Gem.Cli
 {
@@ -11,48 +9,55 @@ namespace Gem.Cli
         {
             try
             {
-                string currentDirectory = Directory.GetCurrentDirectory();
-                string sampleDataDirectory = Path.Combine(currentDirectory, "data", "gem", "sample");
+                string workingDirectory = Directory.GetCurrentDirectory();
+                string configPath = Path.Combine(workingDirectory, "config", "gem", "gem.cli.json");
 
-                if (!Directory.Exists(sampleDataDirectory))
+                GemCliConfiguration configuration;
+
+                // Load and validate configuration.
+                try
                 {
-                    Console.Error.WriteLine(
-                        $"Sample data directory not found: '{sampleDataDirectory}'.");
-
-                    Console.Error.WriteLine(
-                        "Ensure you run the application from the repository root.");
-
+                    var configLoader = new GemConfigLoader(configPath);
+                    configuration = configLoader.Load();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    Console.Error.WriteLine("Configuration file not found.");
+                    Console.Error.WriteLine(ex.Message);
+                    return 1;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.Error.WriteLine("Configuration error.");
+                    Console.Error.WriteLine(ex.Message);
                     return 1;
                 }
 
-                var loader = new GemCsvInputLoader(sampleDataDirectory);
-                GemInputData input = loader.Load();
+                // Execute GEM runner with the loaded configuration.
+                var runner = new GemRunner(configuration);
+                int signalCount = runner.Run();
 
-                GemParameters parameters = GemParameters.Default;
-                var engine = new GemEngine();
-
-                IReadOnlyList<GemSignal> signals = engine.GenerateSignals(input, parameters);
-
-                Console.WriteLine("StrategyNotifier - GEM sample run");
-                Console.WriteLine($"Sample data directory   : {sampleDataDirectory}");
-                Console.WriteLine($"Lookback window (months): {parameters.LookbackMonths}");
-                Console.WriteLine($"Generated signals       : {signals.Count}");
-                Console.WriteLine();
-
-                foreach (GemSignal signal in signals)
-                {
-                    YearMonth period = signal.Period;
-                    Console.WriteLine($"{period.Year:D4}-{period.Month:D2}: {signal.Position}");
-                }
+                Console.WriteLine("StrategyNotifier - GEM CLI");
+                Console.WriteLine($"Configuration file       : {configPath}");
+                Console.WriteLine($"Data directory           : {configuration.DataDirectory}");
+                Console.WriteLine($"Output file              : {configuration.OutputSignalsFile}");
+                Console.WriteLine($"Lookback window (months) : {configuration.LookbackMonths}");
+                Console.WriteLine($"Generated signals        : {signalCount}");
 
                 return 0;
             }
-            catch (Exception exception)
+            catch (FileNotFoundException ex)
+            {
+                Console.Error.WriteLine("Input data file not found.");
+                Console.Error.WriteLine(ex.Message);
+                return 1;
+            }
+            catch (Exception ex)
             {
                 Console.Error.WriteLine(
-                    "An unexpected error occurred while running the GEM sample.");
+                    "An unexpected error occurred while running the GEM CLI.");
 
-                Console.Error.WriteLine(exception.Message);
+                Console.Error.WriteLine(ex.Message);
                 return 1;
             }
         }

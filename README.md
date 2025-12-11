@@ -25,11 +25,12 @@ The project is structured so that GEM is just one strategy under a broader umbre
 
 - `src/Strategies/Gem/Gem.Domain`  
   GEM domain model and core engine:
+
   - `Core` – fundamental value objects and series:
     - `YearMonth` – immutable representation of a year-month period
     - `MonthlyReturn` – monthly return for a given period
     - `AssetKind` – US equity, ex-US equity, safe asset
-    - `AssetReturnSeries` – ordered, validated series of monthly returns
+    - `AssetReturnSeries` – ordered, validated series of monthly returns (sorted and checked for duplicates)
   - `Model` – strategy-specific data contracts:
     - `GemParameters` – GEM configuration (lookback window in months)
     - `GemInputData` – input container for all three asset series
@@ -42,30 +43,78 @@ The project is structured so that GEM is just one strategy under a broader umbre
   - `Exceptions` – `DomainValidationException` for domain-level validation failures
 
 - `src/Strategies/Gem/Gem.Cli`  
-  Console application entry point for running GEM:
+  Configuration-driven console application for running GEM end-to-end:
+
   - `Program.cs`
     - uses the repository root as the working directory
-    - loads sample CSV data from `data/gem/sample`
-    - builds `GemInputData` via the CSV loader
-    - runs `GemEngine` with a configured lookback window (in Phase 2 sample runs this is set to 3 months)
-    - prints a summary and generated signals to the console
-  - `IO/GemCsvInputLoader.cs`
-    - loads three CSV files: `us-equity.csv`, `exus-equity.csv`, `safe-asset.csv`
-    - parses `Year`, `Month` and `Return` using invariant culture
-    - builds `MonthlyReturn` collections and `AssetReturnSeries` instances
-    - constructs a `GemInputData` instance for use by `GemEngine`
-  - `Configuration/` (placeholders for later phases)
-    - `GemCliConfiguration.cs` – planned CLI configuration model (not implemented yet)
-    - `GemConfigLoader.cs` – planned loader for `gem.cli.json` (not implemented yet)
-  - `Execution/` (placeholder for later phases)
-    - `GemRunner.cs` – planned orchestration of configuration, input loading and output generation (not implemented yet)
+    - loads configuration from `config/gem/gem.cli.json`
+    - executes the `GemRunner` with the loaded configuration
+    - prints a concise summary (config path, data directory, output path, lookback, signal count)
+    - returns exit code `0` on success and non-zero on configuration or data errors
+
+  - `Configuration/`
+    - `GemCliConfiguration`
+      - strongly-typed model for GEM CLI settings:
+        - `DataDirectory` – base directory for CSV input data
+        - `UsEquityFile`, `ExUsEquityFile`, `SafeAssetFile` – filenames for the three asset series
+        - `OutputSignalsFile` – target path for `signals.json`
+        - `LookbackMonths` – lookback window in months
+      - `Validate()` enforces non-empty values and positive `LookbackMonths`
+    - `GemConfigLoader`
+      - loads JSON configuration from a given file path (typically `config/gem/gem.cli.json`)
+      - uses case-insensitive property mapping
+      - validates the configuration using `GemCliConfiguration.Validate()`
+      - handles:
+        - missing file (`FileNotFoundException`)
+        - empty file
+        - invalid JSON
+        - invalid configuration values (wrapped in `InvalidOperationException`)
+
+  - `Contracts/`
+    - `GemSignalOutput`
+      - output contract for a single GEM signal in `signals.json`:
+        - `period` – string in `YYYY-MM` format
+        - `position` – string representation of the chosen `AssetKind` (`UsEquity`, `ExUsEquity`, `SafeAsset`)
+
+  - `Execution/`
+    - `GemRunner`
+      - orchestrates the full GEM run based on `GemCliConfiguration`:
+        - builds input paths from `DataDirectory` and configured filenames
+        - uses `GemCsvInputLoader` to load `GemInputData`
+        - creates `GemParameters` from `LookbackMonths`
+        - runs `GemEngine.GenerateSignals`
+        - maps domain `GemSignal` objects to `GemSignalOutput` DTOs
+        - ensures the output directory exists and writes a pretty-printed `signals.json` to `OutputSignalsFile`
+      - returns the number of generated signals so that `Program` can report it
+
+  - `IO/`
+    - `GemCsvInputLoader`
+      - loads GEM input data from three CSV files:
+        - US equity
+        - ex-US equity
+        - safe asset
+      - constructor takes a base directory
+      - `Load()` overload:
+        - uses conventional filenames: `us-equity.csv`, `exus-equity.csv`, `safe-asset.csv`
+      - `Load(usEquityFileName, exUsEquityFileName, safeAssetFileName)` overload:
+        - uses filenames provided by `GemCliConfiguration`
+      - CSV format:
+        - header row: `Year,Month,Return`
+        - one row per month
+        - `Return` is a monthly rate (e.g. `0.02` = 2%)
+      - parses numeric values using invariant culture
+      - builds `MonthlyReturn` and `AssetReturnSeries` for each asset
+      - throws:
+        - `FileNotFoundException` when an expected CSV file is missing
+        - `FormatException` when any row has invalid structure or non-numeric values
 
 ---
 
-### Tests
+## Tests
 
 - `tests/Strategies/Gem/Gem.Domain.Tests`  
   Unit tests for the GEM domain and engine:
+
   - `Core`
     - tests for `YearMonth` construction, comparison and `AddMonths` behavior
     - tests for `AssetReturnSeries` sorting, duplicate detection and lookback windows
@@ -73,28 +122,81 @@ The project is structured so that GEM is just one strategy under a broader umbre
     - tests for `GemParameters` validation (lookback window must be positive)
     - tests for `GemInputData` invariants (null checks and `AssetKind` validation)
   - `Engine`
-    - `GemEngineBasicScenariosTests` – scenarios where each asset type (US, ex-US, safe) always wins
-    - `GemEngineEdgeCasesTests` – insufficient history, null arguments, regime shifts, ties and empty series
+    - `GemEngineBasicScenariosTests`
+      - scenarios where each asset type (US, ex-US, safe) always wins
+    - `GemEngineEdgeCasesTests`
+      - insufficient history
+      - null arguments
+      - regime shifts (switching to safe asset when it becomes superior)
+      - ties between US and ex-US (preference for US)
+      - empty series handling
   - `TestData`
     - `GemTestDataFactory` – helper for building synthetic return series for tests
 
 - `tests/Strategies/Gem/Gem.Cli.Tests`  
   Tests focused on CLI-specific behavior:
-  - `IO/GemCsvInputLoaderTests.cs`
-    - verifies successful loading from valid CSV files
-    - checks behavior when files are missing (`FileNotFoundException`)
-    - checks behavior when numeric values are malformed (`FormatException`)
-    - verifies that header-only files produce empty series
-  - `ProgramTests.cs`
-    - verifies exit code and error output when the sample data directory is missing
-    - verifies successful run, exit code and console output when the sample data directory is present
+
+  - `Configuration/`
+    - `GemCliConfigurationTests`
+      - validates that a well-formed configuration passes `Validate()`
+      - verifies failures for:
+        - empty or whitespace `DataDirectory`
+        - empty or whitespace input filenames
+        - empty or whitespace `OutputSignalsFile`
+        - `LookbackMonths <= 0`
+    - `GemConfigLoaderTests`
+      - covers:
+        - missing configuration file (`FileNotFoundException`)
+        - valid configuration JSON and successful deserialization
+        - invalid JSON (reported as configuration error)
+        - invalid `lookbackMonths` value (validation failure)
+
+  - `Execution/`
+    - `GemRunnerTests`
+      - verifies that a valid configuration and CSV data:
+        - produce `signals.json` at the configured path
+        - result in a non-zero signal count
+      - checks that:
+        - deserialized `GemSignalOutput` list has non-empty periods and positions
+        - specific sample inputs lead to expected signals, for example:
+          - `2025-02: UsEquity`
+          - `2025-03: UsEquity`
+        when using a 2-month lookback
+
+  - `IO/`
+    - `GemCsvInputLoaderTests`
+      - verifies successful loading from valid CSV files
+      - checks behavior when files are missing (`FileNotFoundException`)
+      - checks behavior when numeric values are malformed (`FormatException`)
+      - verifies that header-only files produce empty series
+
+  - `ProgramTests`
+    - `Main` behavior in end-to-end scenarios:
+      - missing `gem.cli.json`:
+        - non-zero exit code
+        - error output containing "Configuration file not found"
+      - valid configuration and sample data:
+        - exit code `0`
+        - standard output contains "StrategyNotifier - GEM CLI" and "Generated signals"
+        - `dist/gem/signals.json` is created and contains at least one signal
+      - invalid configuration values (e.g. `lookbackMonths: 0`):
+        - non-zero exit code
+        - error output contains "Configuration error" and a relevant hint
+      - invalid configuration JSON:
+        - non-zero exit code
+        - error output contains a configuration error mentioning invalid JSON
+      - missing input data file (e.g. no `safe-asset.csv`):
+        - non-zero exit code
+        - error output contains "Input data file not found" and the missing filename
 
 ---
 
-### Configuration
+## Configuration
+
+Configuration files live under `config/gem`:
 
 - `config/gem/gem.cli.sample.json`  
-  Sample GEM CLI configuration file. It documents how a future configuration-driven run will look:
+  Sample GEM CLI configuration file that documents the expected structure and defaults:
 
     {
       "dataDirectory": "data/gem/sample",
@@ -105,71 +207,108 @@ The project is structured so that GEM is just one strategy under a broader umbre
       "lookbackMonths": 12
     }
 
-  In Phase 2 this file is only a reference; it is not yet wired into the CLI.
+  This file is part of the repository and serves as a template.
 
 - `config/gem/gem.cli.json`  
-  User-specific CLI configuration file (planned for later phases).  
-  This file is ignored by Git and is intended to hold local paths and preferences.
+  User-specific CLI configuration file (ignored by Git).  
+  Typical usage:
+
+  1. Copy the sample file:
+
+         cp config/gem/gem.cli.sample.json config/gem/gem.cli.json
+
+  2. Adjust paths and settings to match your local environment, for example:
+     - switch `dataDirectory` from `data/gem/sample` to `data/gem/raw`
+     - change `lookbackMonths` from `12` to `3` if you want to experiment
+
+The CLI always looks for `config/gem/gem.cli.json` relative to the current working directory.
 
 ---
 
-### Data folders
+## Data folders
 
 - `data/gem/sample/`  
   Synthetic, versioned sample data used for local runs and tests:
+
   - `us-equity.csv`
   - `exus-equity.csv`
   - `safe-asset.csv`
 
-  Each file has the following structure:
+  CSV format:
 
     Year,Month,Return
     2025,1,0.02
     2025,2,0.03
+    2025,3,-0.01
     ...
 
   Semantics:
-  - one row per month
-  - `Return` is the monthly rate (e.g. 0.02 = 2%)
+
+  - one row per calendar month
+  - `Return` is a monthly rate (e.g. `0.02` = 2%)
 
 - `data/gem/raw/`  
-  Reserved for real market data (e.g. exported or downloaded from external sources).  
-  This directory is ignored by Git so that real data never accidentally enters version control.
+  Reserved for real market data (for example, exported from external data providers).  
+  This directory is ignored by Git so that real, possibly proprietary data never enters version control.
 
 ---
 
-### Output folder
+## Output folder
 
 - `dist/gem/`  
   Output directory for GEM-related artifacts:
-  - `.gitkeep` – ensures the directory structure is tracked in Git
-  - `signals.json` – planned output file for GEM signals
 
-  The directory itself is tracked, but generated files under `dist/` are excluded from version control.  
-  In Phase 2 the CLI prints signals only to the console; writing `signals.json` will be introduced in a later phase.
+  - `.gitkeep` – ensures the directory structure is tracked in Git
+  - `signals.json` – JSON file with generated GEM signals
+
+  The `dist/` tree is excluded from version control, so `signals.json` and other generated artifacts are not committed.
+
+### `signals.json` format
+
+The CLI writes `signals.json` as a JSON array of objects. Each object has:
+
+- `period` – string in `YYYY-MM` format
+- `position` – one of `UsEquity`, `ExUsEquity`, `SafeAsset`
+
+Example shape:
+
+    [
+      {
+        "period": "2025-03",
+        "position": "UsEquity"
+      },
+      {
+        "period": "2025-04",
+        "position": "SafeAsset"
+      }
+    ]
+
+Future phases may extend each element with additional fields (e.g. momentum metrics), but the existing fields will remain stable.
 
 ---
 
 ## Current status
 
-The project is currently at **Phase 2**:
+The project is currently at **Phase 3**:
 
 - Solution, projects and shared build configuration are in place.
 - GEM domain model and engine are fully implemented and covered with unit tests.
-- CSV-based input pipeline is implemented:
-  - sample CSV files are provided under `data/gem/sample`
-  - `GemCsvInputLoader` converts them into `GemInputData`
-- The console application can perform a complete sample run:
-  - load sample CSV data
-  - run GEM with a configurable lookback window (3 months in the default Phase 2 setup)
-  - display a summary and the generated monthly signals
+- CSV-based input pipeline is implemented and reusable via `GemCsvInputLoader`.
+- The CLI is now configuration-driven:
+  - settings are loaded from `config/gem/gem.cli.json`
+  - invalid configuration or JSON is reported with clear error messages
+- Full vertical slice is completed:
+  - CSV input (monthly returns)
+  - GEM engine execution
+  - JSON signals output (`dist/gem/signals.json`)
+  - end-to-end behavior covered by tests
 
 Future phases will introduce:
 
-- configuration-driven CLI (using `gem.cli.json`)
-- writing signals to `dist/gem/signals.json`
-- a static frontend consuming `signals.json`
-- CI/CD with GitHub Actions and publishing via GitHub Pages
+- static frontend consuming `signals.json`
+- CI/CD with GitHub Actions
+- publishing via GitHub Pages
+- optional integration with external schedulers or notification channels
 
 ---
 
@@ -179,43 +318,54 @@ From the repository root:
 
 - Build the solution:
 
-    dotnet build
+      dotnet build
 
 - Run all tests:
 
-    dotnet test
+      dotnet test
 
 ---
 
-## Running a sample GEM execution
+## Running GEM from the CLI
 
-From the repository root:
+1. Ensure you have a valid CLI configuration:
 
-1. Ensure the sample data files exist under `data/gem/sample`:
-   - `us-equity.csv`
-   - `exus-equity.csv`
-   - `safe-asset.csv`
+   - Create or update `config/gem/gem.cli.json`.
+   - For example, you can base it on the sample:
 
-2. Run the GEM CLI:
+         cp config/gem/gem.cli.sample.json config/gem/gem.cli.json
 
-    dotnet run --project src/Strategies/Gem/Gem.Cli/Gem.Cli.csproj
+   - Adjust paths and `lookbackMonths` if needed.
 
-The application:
+2. Make sure the configured data directory and CSV files exist.  
+   For example, if you use the sample configuration, ensure:
 
-- resolves the sample data directory relative to the current working directory
-- loads monthly returns from the three CSV files
-- applies the GEM engine with a configured lookback window (3 months in the current Phase 2 sample)
-- prints the number of generated signals and a line per month in the form:
+   - `data/gem/sample/us-equity.csv`
+   - `data/gem/sample/exus-equity.csv`
+   - `data/gem/sample/safe-asset.csv`
 
-    YYYY-MM: Position
+3. From the repository root, run the GEM CLI:
 
-For example:
+      dotnet run --project src/Strategies/Gem/Gem.Cli/Gem.Cli.csproj
 
-    2025-03: UsEquity
-    2025-04: SafeAsset
-    2025-05: SafeAsset
-    2025-06: SafeAsset
+The application will:
 
-If you change the lookback window in `Program.cs` (for example back to `GemParameters.Default`, which uses 12 months), the generated signals and the example above will naturally change to reflect the new configuration.
+- load configuration from `config/gem/gem.cli.json`
+- load monthly returns from the three CSV files
+- apply the GEM engine with the configured lookback window
+- write `signals.json` to the configured output path
+- print a summary similar to:
 
-As the project evolves, configuration, output paths and execution modes will be driven by `gem.cli.json` and higher-level runners rather than hard-coded paths in the `Program` entry point.
+    StrategyNotifier - GEM CLI
+    Configuration file       : /path/to/repo/config/gem/gem.cli.json
+    Data directory           : data/gem/sample
+    Output file              : dist/gem/signals.json
+    Lookback window (months) : 2
+    Generated signals        : 2
+
+If something is misconfigured or a data file is missing, the CLI will:
+
+- write a descriptive error message to standard error, and
+- terminate with a non-zero exit code.
+
+As the project evolves, the same `signals.json` contract will be consumed by a static frontend, automation workflows and notification mechanisms.

@@ -16,8 +16,7 @@ namespace Gem.Cli.IO
         /// Initializes a new instance of the <see cref="GemCsvInputLoader"/> class.
         /// </summary>
         /// <param name="baseDirectory">
-        /// Base directory containing the CSV files:
-        /// <c>us-equity.csv</c>, <c>exus-equity.csv</c> and <c>safe-asset.csv</c>.
+        /// Base directory containing the CSV files.
         /// </param>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="baseDirectory"/> is <c>null</c>, empty or whitespace.
@@ -35,8 +34,24 @@ namespace Gem.Cli.IO
         }
 
         /// <summary>
+        /// Loads GEM input data from CSV files located in the configured base directory,
+        /// using the default file names:
+        /// <c>us-equity.csv</c>, <c>exus-equity.csv</c> and <c>safe-asset.csv</c>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="GemInputData"/> instance built from the CSV files.
+        /// </returns>
+        public GemInputData Load()
+        {
+            return Load("us-equity.csv", "exus-equity.csv", "safe-asset.csv");
+        }
+
+        /// <summary>
         /// Loads GEM input data from CSV files located in the configured base directory.
         /// </summary>
+        /// <param name="usEquityFileName">File name for the US equity series.</param>
+        /// <param name="exUsEquityFileName">File name for the ex-US equity series.</param>
+        /// <param name="safeAssetFileName">File name for the safe asset series.</param>
         /// <returns>
         /// A <see cref="GemInputData"/> instance built from the CSV files.
         /// </returns>
@@ -46,11 +61,14 @@ namespace Gem.Cli.IO
         /// <exception cref="FormatException">
         /// Thrown when any CSV row contains an invalid numeric value or malformed columns.
         /// </exception>
-        public GemInputData Load()
+        public GemInputData Load(
+            string usEquityFileName,
+            string exUsEquityFileName,
+            string safeAssetFileName)
         {
-            AssetReturnSeries usEquitySeries = LoadAssetSeries("us-equity.csv", AssetKind.UsEquity);
-            AssetReturnSeries exUsEquitySeries = LoadAssetSeries("exus-equity.csv", AssetKind.ExUsEquity);
-            AssetReturnSeries safeAssetSeries = LoadAssetSeries("safe-asset.csv", AssetKind.SafeAsset);
+            AssetReturnSeries usEquitySeries = LoadAssetSeries(usEquityFileName, AssetKind.UsEquity);
+            AssetReturnSeries exUsEquitySeries = LoadAssetSeries(exUsEquityFileName, AssetKind.ExUsEquity);
+            AssetReturnSeries safeAssetSeries = LoadAssetSeries(safeAssetFileName, AssetKind.SafeAsset);
 
             return new GemInputData(usEquitySeries, exUsEquitySeries, safeAssetSeries);
         }
