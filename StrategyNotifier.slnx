@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/Strategies/Gem/Gem.Cli/Gem.Cli.csproj" />
+  <Project Path="src/Strategies/Gem/Gem.Domain/Gem.Domain.csproj" />
+  <Project Path="tests/Strategies/Gem/Gem.Domain.Tests/Gem.Domain.Tests.csproj" Id="31a63cbe-a1b6-4d71-a24b-44ad10ab635d" />
+</Solution>
