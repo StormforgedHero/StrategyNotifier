@@ -1,7 +1,7 @@
 # StrategyNotifier
 
 StrategyNotifier is a .NET-based tool for running and notifying about quantitative investment strategies.
-The first implemented strategy will be **GEM (Global Equities Momentum)**.
+The first implemented strategy is **GEM (Global Equities Momentum)**.
 
 ## Technology stack
 
@@ -13,18 +13,58 @@ The first implemented strategy will be **GEM (Global Equities Momentum)**.
   - GitHub Actions
   - GitHub Pages
 
-## Solution structure (Phase 0)
+## Solution structure
 
-- `src/Strategies/Gem/Gem.Domain` – domain model for the GEM strategy (empty in Phase 0, contains only a technical marker type)
-- `src/Strategies/Gem/Gem.Cli` – console application entry point for running GEM-related commands
-- `tests/Strategies/Gem/Gem.Domain.Tests` – unit tests for the GEM domain and related behavior
+- `src/Strategies/Gem/Gem.Domain`  
+  GEM domain model and core engine:
+  - `Core` – fundamental value objects and series:
+    - `YearMonth` – immutable representation of a year-month period
+    - `MonthlyReturn` – monthly return for a given period
+    - `AssetKind` – US equity, ex-US equity, safe asset
+    - `AssetReturnSeries` – ordered, validated series of monthly returns
+  - `Model` – strategy-specific data contracts:
+    - `GemParameters` – GEM configuration (lookback window)
+    - `GemInputData` – input container for all three asset series
+    - `GemSignal` – monthly allocation decision for a given period
+  - `Engine` – `GemEngine` implementing relative and absolute momentum logic
+  - `Exceptions` – `DomainValidationException` for domain-level validation failures
 
-## Current status (Phase 0)
+- `src/Strategies/Gem/Gem.Cli`  
+  Console application entry point for running GEM-related commands.  
+  Currently a placeholder that will be extended in later phases to:
+  - load configuration and input data,
+  - invoke the GEM engine,
+  - persist generated signals (e.g., to `signals.json`).
+
+- `tests/Strategies/Gem/Gem.Domain.Tests`  
+  Unit tests for the GEM domain and engine:
+  - `Core` tests for `YearMonth`, `MonthlyReturn` and `AssetReturnSeries`
+  - `Model` tests for `GemParameters` and `GemInputData`
+  - `Engine` tests for `GemEngine` basic scenarios and edge cases
+  - `TestData` helpers (`GemTestDataFactory`) for building synthetic return series
+
+## Current status (Phase 1)
 
 - Solution skeleton created
-- Basic CLI entry point with a placeholder message
-- GEM domain project created (no business logic yet)
-- Test project configured with xUnit and a smoke test to verify the test setup
+- Shared build configuration enforced via `Directory.Build.props`
+- GEM domain model implemented:
+  - value objects for periods and monthly returns
+  - typed asset kinds and validated return series
+  - domain model for GEM parameters, input data and signals
+- GEM engine implemented:
+  - identifies common periods across all three assets
+  - builds rolling lookback windows per asset
+  - selects the relative winner between US and ex-US equities
+  - compares the winner momentum against the safe asset (absolute momentum)
+  - produces a sequence of monthly allocation decisions
+- Domain tests implemented with xUnit for:
+  - YearMonth construction, comparison and month arithmetic
+  - AssetReturnSeries sorting, duplicate detection and lookback windows
+  - GemParameters validation
+  - GemInputData invariants and null handling
+  - GemEngine basic scenarios (US, ex-US, safe asset always winning)
+  - GemEngine edge cases (insufficient history, null arguments, regime shifts, ties, empty series)
+- CLI project present with a minimal placeholder entry point
 
 ## Prerequisites
 
