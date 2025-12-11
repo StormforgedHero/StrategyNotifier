@@ -8,5 +8,6 @@
   </Folder>
   <Project Path="src/Strategies/Gem/Gem.Cli/Gem.Cli.csproj" />
   <Project Path="src/Strategies/Gem/Gem.Domain/Gem.Domain.csproj" />
+  <Project Path="tests/Strategies/Gem/Gem.Cli.Tests/Gem.Cli.Tests.csproj" Id="79c62e28-ebd6-4d0f-aff2-33a3343fa2ba" />
   <Project Path="tests/Strategies/Gem/Gem.Domain.Tests/Gem.Domain.Tests.csproj" Id="31a63cbe-a1b6-4d71-a24b-44ad10ab635d" />
 </Solution>

@@ -1,0 +1,8 @@
+{
+  "dataDirectory": "data/gem/sample",
+  "usEquityFile": "us-equity.csv",
+  "exUsEquityFile": "exus-equity.csv",
+  "safeAssetFile": "safe-asset.csv",
+  "outputSignalsFile": "dist/gem/signals.json",
+  "lookbackMonths": 12
+}
