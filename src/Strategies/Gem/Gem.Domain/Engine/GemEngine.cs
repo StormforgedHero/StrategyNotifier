@@ -53,10 +53,16 @@ namespace Gem.Domain.Engine
                     exUsWindow = input.ExUsEquity.GetLookbackWindow(period, lookbackMonths);
                     safeWindow = input.SafeAsset.GetLookbackWindow(period, lookbackMonths);
                 }
-                catch (DomainValidationException)
+                catch (InsufficientHistoryException)
                 {
-                    // Not enough data to build the lookback window for at least one series.
-                    // This is expected for early periods; they are skipped.
+                    // Not enough history to build the lookback window for at least one series
+                    // for this period. Such periods are skipped.
+                    continue;
+                }
+                catch (NonConsecutivePeriodsException)
+                {
+                    // The lookback window contains a gap (non-consecutive periods).
+                    // Such periods are skipped to allow generating signals where possible.
                     continue;
                 }
 

@@ -1,166 +1,182 @@
 ﻿using Gem.Cli.Configuration;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.Configuration
 {
     public class GemConfigLoaderTests
     {
         [Fact]
+        public void Constructor_WithNullPath_ThrowsArgumentNullException()
+        {
+            ArgumentNullException ex =
+                Assert.Throws<ArgumentNullException>(() => new GemConfigLoader(null!));
+
+            Assert.Equal("configFilePath", ex.ParamName);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void Constructor_WithEmptyOrWhitespacePath_ThrowsArgumentException(string configFilePath)
+        {
+            ArgumentException ex =
+                Assert.Throws<ArgumentException>(() => new GemConfigLoader(configFilePath));
+
+            Assert.Equal("configFilePath", ex.ParamName);
+        }
+
+        [Fact]
         public void Load_WithMissingFile_ThrowsFileNotFoundException()
         {
-            // Arrange
-            string tempDirectory = CreateTemporaryDirectory();
+            using var context = GemConfigLoaderTestContext.Create();
 
-            try
-            {
-                string configPath = Path.Combine(tempDirectory, "config", "gem", "gem.cli.json");
-                var loader = new GemConfigLoader(configPath);
+            FileNotFoundException ex =
+                Assert.Throws<FileNotFoundException>(() => context.Load());
 
-                // Act & Assert
-                Assert.Throws<FileNotFoundException>(() => loader.Load());
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(tempDirectory);
-            }
+            Assert.Equal(context.ConfigPath, ex.FileName);
+        }
+
+        [Fact]
+        public void Load_WithEmptyFile_ThrowsInvalidOperationException()
+        {
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig(string.Empty);
+
+            InvalidOperationException ex =
+                Assert.Throws<InvalidOperationException>(() => context.Load());
+
+            Assert.Contains("is empty", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void Load_WithWhitespaceOnlyFile_ThrowsInvalidOperationException()
+        {
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig("   " + Environment.NewLine);
+
+            InvalidOperationException ex =
+                Assert.Throws<InvalidOperationException>(() => context.Load());
+
+            Assert.Contains("is empty", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
         public void Load_WithValidConfigurationFile_ReturnsValidatedConfiguration()
         {
-            // Arrange
-            string tempDirectory = CreateTemporaryDirectory();
-            try
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig("""
             {
-                string configDirectory = Path.Combine(tempDirectory, "config", "gem");
-                Directory.CreateDirectory(configDirectory);
-
-                string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
-                string json = """
-                {
-                  "dataDirectory": "data/gem/sample",
-                  "usEquityFile": "us-equity.csv",
-                  "exUsEquityFile": "exus-equity.csv",
-                  "safeAssetFile": "safe-asset.csv",
-                  "outputSignalsFile": "dist/gem/signals.json",
-                  "lookbackMonths": 12
-                }
-                """;
-
-                File.WriteAllText(configPath, json);
-
-                var loader = new GemConfigLoader(configPath);
-
-                // Act
-                GemCliConfiguration configuration = loader.Load();
-
-                // Assert
-                Assert.Equal("data/gem/sample", configuration.DataDirectory);
-                Assert.Equal("us-equity.csv", configuration.UsEquityFile);
-                Assert.Equal("exus-equity.csv", configuration.ExUsEquityFile);
-                Assert.Equal("safe-asset.csv", configuration.SafeAssetFile);
-                Assert.Equal("dist/gem/signals.json", configuration.OutputSignalsFile);
-                Assert.Equal(12, configuration.LookbackMonths);
+              "dataDirectory": "data/gem/sample",
+              "usEquityFile": "us-equity.csv",
+              "exUsEquityFile": "exus-equity.csv",
+              "safeAssetFile": "safe-asset.csv",
+              "outputSignalsFile": "dist/gem/signals.json",
+              "lookbackMonths": 12
             }
-            finally
-            {
-                DeleteDirectoryIfExists(tempDirectory);
-            }
+            """);
+
+            GemCliConfiguration configuration = context.Load();
+
+            Assert.Equal("data/gem/sample", configuration.DataDirectory);
+            Assert.Equal("us-equity.csv", configuration.UsEquityFile);
+            Assert.Equal("exus-equity.csv", configuration.ExUsEquityFile);
+            Assert.Equal("safe-asset.csv", configuration.SafeAssetFile);
+            Assert.Equal("dist/gem/signals.json", configuration.OutputSignalsFile);
+            Assert.Equal(12, configuration.LookbackMonths);
         }
 
         [Fact]
         public void Load_WithInvalidJson_ThrowsInvalidOperationException()
         {
-            // Arrange
-            string tempDirectory = CreateTemporaryDirectory();
-            try
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig("""
             {
-                string configDirectory = Path.Combine(tempDirectory, "config", "gem");
-                Directory.CreateDirectory(configDirectory);
+              "dataDirectory": "data/gem/sample"
+            """);
 
-                string configPath = Path.Combine(configDirectory, "gem.cli.json");
+            InvalidOperationException ex =
+                Assert.Throws<InvalidOperationException>(() => context.Load());
 
-                // Invalid JSON (missing closing brace).
-                string json = """
-                {
-                  "dataDirectory": "data/gem/sample"
-                """;
-
-                File.WriteAllText(configPath, json);
-
-                var loader = new GemConfigLoader(configPath);
-
-                // Act & Assert
-                Assert.Throws<InvalidOperationException>(() => loader.Load());
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(tempDirectory);
-            }
+            Assert.Contains("invalid JSON", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
         public void Load_WithInvalidLookbackMonths_ThrowsInvalidOperationException()
         {
-            // Arrange
-            string tempDirectory = CreateTemporaryDirectory();
-            try
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig("""
             {
-                string configDirectory = Path.Combine(tempDirectory, "config", "gem");
-                Directory.CreateDirectory(configDirectory);
-
-                string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
-                string json = """
-                {
-                  "dataDirectory": "data/gem/sample",
-                  "usEquityFile": "us-equity.csv",
-                  "exUsEquityFile": "exus-equity.csv",
-                  "safeAssetFile": "safe-asset.csv",
-                  "outputSignalsFile": "dist/gem/signals.json",
-                  "lookbackMonths": 0
-                }
-                """;
-
-                File.WriteAllText(configPath, json);
-
-                var loader = new GemConfigLoader(configPath);
-
-                // Act & Assert
-                Assert.Throws<InvalidOperationException>(() => loader.Load());
+              "dataDirectory": "data/gem/sample",
+              "usEquityFile": "us-equity.csv",
+              "exUsEquityFile": "exus-equity.csv",
+              "safeAssetFile": "safe-asset.csv",
+              "outputSignalsFile": "dist/gem/signals.json",
+              "lookbackMonths": 0
             }
-            finally
-            {
-                DeleteDirectoryIfExists(tempDirectory);
-            }
+            """);
+
+            InvalidOperationException ex =
+                Assert.Throws<InvalidOperationException>(() => context.Load());
+
+            Assert.Contains("lookbackMonths", ex.Message, StringComparison.Ordinal);
         }
 
-        private static string CreateTemporaryDirectory()
+        [Fact]
+        public void Load_WithMissingRequiredConfigurationValues_ThrowsInvalidOperationException()
         {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
+            using var context = GemConfigLoaderTestContext.Create();
+
+            context.WriteConfig("""
+            {
+              "lookbackMonths": 12,
+              "outputSignalsFile": "dist/gem/signals.json"
+            }
+            """);
+
+            InvalidOperationException ex =
+                Assert.Throws<InvalidOperationException>(() => context.Load());
+
+            Assert.Contains("dataDirectory", ex.Message, StringComparison.Ordinal);
         }
 
-        private static void DeleteDirectoryIfExists(string directory)
+        private sealed class GemConfigLoaderTestContext : IDisposable
         {
-            if (string.IsNullOrWhiteSpace(directory))
+            public string RootDirectory { get; }
+            public string ConfigDirectory { get; }
+            public string ConfigPath { get; }
+
+            private GemConfigLoaderTestContext(string rootDirectory)
             {
-                return;
+                RootDirectory = rootDirectory;
+                ConfigDirectory = Path.Combine(rootDirectory, "config", "gem");
+                ConfigPath = Path.Combine(ConfigDirectory, "gem.cli.json");
             }
 
-            if (!Directory.Exists(directory))
+            public static GemConfigLoaderTestContext Create()
             {
-                return;
+                string rootDirectory = TestFileSystem.CreateTemporaryDirectory();
+                return new GemConfigLoaderTestContext(rootDirectory);
             }
 
-            try
+            public void WriteConfig(string jsonContent)
             {
-                Directory.Delete(directory, recursive: true);
+                TestFileSystem.WriteTextFile(ConfigDirectory, "gem.cli.json", jsonContent);
             }
-            catch
+
+            public GemCliConfiguration Load()
             {
-                // Ignore cleanup failures in tests.
+                var loader = new GemConfigLoader(ConfigPath);
+                return loader.Load();
+            }
+
+            public void Dispose()
+            {
+                TestFileSystem.DeleteDirectoryIfExists(RootDirectory);
             }
         }
     }

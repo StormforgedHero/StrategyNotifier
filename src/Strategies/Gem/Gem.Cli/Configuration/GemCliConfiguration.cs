@@ -8,6 +8,8 @@ namespace Gem.Cli.Configuration
     /// </summary>
     public sealed class GemCliConfiguration
     {
+        private const string MessageMustNotBeBlank = "Configuration value '{0}' must not be null, empty or whitespace.";
+
         [JsonPropertyName("dataDirectory")]
         public string DataDirectory { get; set; } = string.Empty;
 
@@ -32,40 +34,24 @@ namespace Gem.Cli.Configuration
         /// </summary>
         public void Validate()
         {
-            if (string.IsNullOrWhiteSpace(DataDirectory))
-            {
-                throw new InvalidOperationException(
-                    "Configuration value 'dataDirectory' must not be null, empty or whitespace.");
-            }
-
-            if (string.IsNullOrWhiteSpace(UsEquityFile))
-            {
-                throw new InvalidOperationException(
-                    "Configuration value 'usEquityFile' must not be null, empty or whitespace.");
-            }
-
-            if (string.IsNullOrWhiteSpace(ExUsEquityFile))
-            {
-                throw new InvalidOperationException(
-                    "Configuration value 'exUsEquityFile' must not be null, empty or whitespace.");
-            }
-
-            if (string.IsNullOrWhiteSpace(SafeAssetFile))
-            {
-                throw new InvalidOperationException(
-                    "Configuration value 'safeAssetFile' must not be null, empty or whitespace.");
-            }
-
-            if (string.IsNullOrWhiteSpace(OutputSignalsFile))
-            {
-                throw new InvalidOperationException(
-                    "Configuration value 'outputSignalsFile' must not be null, empty or whitespace.");
-            }
+            RequireNotBlank(DataDirectory, "dataDirectory");
+            RequireNotBlank(UsEquityFile, "usEquityFile");
+            RequireNotBlank(ExUsEquityFile, "exUsEquityFile");
+            RequireNotBlank(SafeAssetFile, "safeAssetFile");
+            RequireNotBlank(OutputSignalsFile, "outputSignalsFile");
 
             if (LookbackMonths <= 0)
             {
                 throw new InvalidOperationException(
                     "Configuration value 'lookbackMonths' must be greater than zero.");
+            }
+        }
+
+        private static void RequireNotBlank(string value, string key)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidOperationException(string.Format(MessageMustNotBeBlank, key));
             }
         }
     }

@@ -3,6 +3,7 @@ using Gem.Cli.Contracts;
 using Gem.Cli.IO;
 using Gem.Domain.Engine;
 using Gem.Domain.Model;
+using System.Text;
 using System.Text.Json;
 
 namespace Gem.Cli.Execution
@@ -13,6 +14,8 @@ namespace Gem.Cli.Execution
     /// </summary>
     public sealed class GemRunner
     {
+        private static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
         private readonly GemCliConfiguration _configuration;
 
         public GemRunner(GemCliConfiguration configuration)
@@ -74,7 +77,7 @@ namespace Gem.Cli.Execution
 
             string json = JsonSerializer.Serialize(outputs, options);
 
-            File.WriteAllText(outputPath, json);
+            File.WriteAllText(outputPath, json, Utf8NoBom);
         }
     }
 }

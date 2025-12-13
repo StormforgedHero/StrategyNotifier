@@ -92,6 +92,26 @@ namespace Gem.Domain.Tests.Engine
         }
 
         [Fact]
+        public void GenerateSignals_WhenLookbackWindowContainsGap_ReturnsNoSignals()
+        {
+            // Arrange
+            GemInputData input = CreateInputDataWithGapInsideLookbackWindow();
+            var parameters = new GemParameters(lookbackMonths: 3);
+            var engine = new GemEngine();
+
+            // Act
+            IReadOnlyList<GemSignal>? signals = null;
+
+            Exception? exception = Record.Exception(
+                () => signals = engine.GenerateSignals(input, parameters));
+
+            // Assert
+            Assert.Null(exception);
+            Assert.NotNull(signals);
+            Assert.Empty(signals!);
+        }
+
+        [Fact]
         public void GenerateSignals_WhenSafeBecomesSuperior_SwitchesToSafeAsset()
         {
             // Arrange
@@ -246,6 +266,90 @@ namespace Gem.Domain.Tests.Engine
             Assert.Empty(signalsWithEmptyUs);
             Assert.Empty(signalsWithEmptyExUs);
             Assert.Empty(signalsWithEmptySafe);
+        }
+
+        [Fact]
+        public void GenerateSignals_WhenLookbackWindowHasGap_SkipsAffectedPeriods()
+        {
+            // Arrange
+            var usSeries = new AssetReturnSeries(
+                AssetKind.UsEquity,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.02m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.02m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.02m)
+                });
+
+            var exUsSeries = new AssetReturnSeries(
+                AssetKind.ExUsEquity,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.01m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.01m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.01m)
+                });
+
+            var safeSeries = new AssetReturnSeries(
+                AssetKind.SafeAsset,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.00m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.00m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.00m)
+                });
+
+            var input = new GemInputData(usSeries, exUsSeries, safeSeries);
+            var parameters = new GemParameters(lookbackMonths: 2);
+            var engine = new GemEngine();
+
+            // Act
+            var signals = engine.GenerateSignals(input, parameters);
+
+            // Assert
+            Assert.Single(signals);
+            Assert.Equal(new YearMonth(2025, 4), signals[0].Period);
+            Assert.Equal(AssetKind.UsEquity, signals[0].Position);
+        }
+
+        private static GemInputData CreateInputDataWithGapInsideLookbackWindow()
+        {
+            // Common periods across all 3 series:
+            // 2025-01, 2025-03, 2025-04 (missing 2025-02 -> gap in many windows).
+            var usSeries = new AssetReturnSeries(
+                AssetKind.UsEquity,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.02m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.02m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.02m)
+                });
+
+            var exUsSeries = new AssetReturnSeries(
+                AssetKind.ExUsEquity,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.01m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.01m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.01m)
+                });
+
+            var safeSeries = new AssetReturnSeries(
+                AssetKind.SafeAsset,
+                new[]
+                {
+                    new MonthlyReturn(new YearMonth(2025, 1), 0.00m),
+                    // Missing 2025-02
+                    new MonthlyReturn(new YearMonth(2025, 3), 0.00m),
+                    new MonthlyReturn(new YearMonth(2025, 4), 0.00m)
+                });
+
+            return new GemInputData(usSeries, exUsSeries, safeSeries);
         }
     }
 }

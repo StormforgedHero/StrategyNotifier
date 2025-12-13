@@ -7,17 +7,16 @@ namespace Gem.Cli.Configuration
     /// </summary>
     public sealed class GemConfigLoader
     {
+        private static readonly JsonSerializerOptions SerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         private readonly string _configFilePath;
 
         public GemConfigLoader(string configFilePath)
         {
-            if (string.IsNullOrWhiteSpace(configFilePath))
-            {
-                throw new ArgumentException(
-                    "Configuration file path must not be null, empty or whitespace.",
-                    nameof(configFilePath));
-            }
-
+            ArgumentException.ThrowIfNullOrWhiteSpace(configFilePath);
             _configFilePath = configFilePath;
         }
 
@@ -48,16 +47,11 @@ namespace Gem.Cli.Configuration
                     $"Configuration file '{_configFilePath}' is empty.");
             }
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
             GemCliConfiguration? configuration;
 
             try
             {
-                configuration = JsonSerializer.Deserialize<GemCliConfiguration>(json, options);
+                configuration = JsonSerializer.Deserialize<GemCliConfiguration>(json, SerializerOptions);
             }
             catch (JsonException ex)
             {
@@ -73,7 +67,6 @@ namespace Gem.Cli.Configuration
             }
 
             configuration.Validate();
-
             return configuration;
         }
     }

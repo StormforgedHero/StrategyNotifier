@@ -1,6 +1,7 @@
 ﻿using Gem.Domain.Core;
 using Gem.Domain.Model;
 using System.Globalization;
+using System.Text;
 
 namespace Gem.Cli.IO
 {
@@ -10,17 +11,21 @@ namespace Gem.Cli.IO
     /// </summary>
     public sealed class GemCsvInputLoader
     {
+        private static readonly CultureInfo InvariantCulture = CultureInfo.InvariantCulture;
+        private static readonly CultureInfo CommaDecimalCulture = CultureInfo.GetCultureInfo("pl-PL");
+
+        private const string DefaultUsEquityFile = "us-equity.csv";
+        private const string DefaultExUsEquityFile = "exus-equity.csv";
+        private const string DefaultSafeAssetFile = "safe-asset.csv";
+
+        private const NumberStyles DecimalStyles =
+            NumberStyles.AllowLeadingWhite
+            | NumberStyles.AllowTrailingWhite
+            | NumberStyles.AllowLeadingSign
+            | NumberStyles.AllowDecimalPoint;
+
         private readonly string _baseDirectory;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GemCsvInputLoader"/> class.
-        /// </summary>
-        /// <param name="baseDirectory">
-        /// Base directory containing the CSV files.
-        /// </param>
-        /// <exception cref="ArgumentException">
-        /// Thrown when <paramref name="baseDirectory"/> is <c>null</c>, empty or whitespace.
-        /// </exception>
         public GemCsvInputLoader(string baseDirectory)
         {
             if (string.IsNullOrWhiteSpace(baseDirectory))
@@ -33,34 +38,11 @@ namespace Gem.Cli.IO
             _baseDirectory = baseDirectory;
         }
 
-        /// <summary>
-        /// Loads GEM input data from CSV files located in the configured base directory,
-        /// using the default file names:
-        /// <c>us-equity.csv</c>, <c>exus-equity.csv</c> and <c>safe-asset.csv</c>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="GemInputData"/> instance built from the CSV files.
-        /// </returns>
         public GemInputData Load()
         {
-            return Load("us-equity.csv", "exus-equity.csv", "safe-asset.csv");
+            return Load(DefaultUsEquityFile, DefaultExUsEquityFile, DefaultSafeAssetFile);
         }
 
-        /// <summary>
-        /// Loads GEM input data from CSV files located in the configured base directory.
-        /// </summary>
-        /// <param name="usEquityFileName">File name for the US equity series.</param>
-        /// <param name="exUsEquityFileName">File name for the ex-US equity series.</param>
-        /// <param name="safeAssetFileName">File name for the safe asset series.</param>
-        /// <returns>
-        /// A <see cref="GemInputData"/> instance built from the CSV files.
-        /// </returns>
-        /// <exception cref="FileNotFoundException">
-        /// Thrown when any of the expected CSV files is missing.
-        /// </exception>
-        /// <exception cref="FormatException">
-        /// Thrown when any CSV row contains an invalid numeric value or malformed columns.
-        /// </exception>
         public GemInputData Load(
             string usEquityFileName,
             string exUsEquityFileName,
@@ -85,29 +67,42 @@ namespace Gem.Cli.IO
             }
 
             using var stream = File.OpenRead(path);
-            using var reader = new StreamReader(stream);
+            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
 
-            // Read header line (e.g. "Year,Month,Return").
-            // If the file is empty, return an empty series.
-            if (reader.ReadLine() is null)
+            int lineNumber = 0;
+
+            // Find header (skip blanks and comment lines).
+            string? headerLine = ReadNextNonIgnorableLine(reader, ref lineNumber);
+
+            if (headerLine is null)
             {
+                // Empty file or only comments -> treat as empty series.
                 return new AssetReturnSeries(assetKind, Array.Empty<MonthlyReturn>());
+            }
+
+            char delimiter = DetectDelimiter(headerLine);
+
+            string[] headerColumns = SplitCsvLine(headerLine, delimiter);
+
+            if (!IsValidHeader(headerColumns))
+            {
+                throw new FormatException(
+                    $"Invalid CSV header in '{path}'. Expected columns: Year{delimiter}Month{delimiter}Return.");
             }
 
             var items = new List<MonthlyReturn>();
             string? line;
-            int lineNumber = 1;
 
             while ((line = reader.ReadLine()) is not null)
             {
                 lineNumber++;
 
-                if (string.IsNullOrWhiteSpace(line))
+                if (IsIgnorableLine(line))
                 {
                     continue;
                 }
 
-                string[] columns = line.Split(',');
+                string[] columns = SplitCsvLine(line, delimiter);
 
                 if (columns.Length < 3)
                 {
@@ -115,31 +110,265 @@ namespace Gem.Cli.IO
                         $"Line {lineNumber} in '{path}' does not contain at least three columns (Year,Month,Return).");
                 }
 
-                if (!int.TryParse(columns[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int year))
+                string yearToken = NormalizeToken(columns[0]);
+                string monthToken = NormalizeToken(columns[1]);
+                string returnToken = NormalizeToken(columns[2]);
+
+                // Allow trailing comments in the Return column.
+                returnToken = StripTrailingComment(returnToken);
+
+                if (!int.TryParse(yearToken, NumberStyles.Integer, InvariantCulture, out int year))
                 {
                     throw new FormatException(
                         $"Invalid year value '{columns[0]}' on line {lineNumber} in '{path}'.");
                 }
 
-                if (!int.TryParse(columns[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int month))
+                if (!int.TryParse(monthToken, NumberStyles.Integer, InvariantCulture, out int month))
                 {
                     throw new FormatException(
                         $"Invalid month value '{columns[1]}' on line {lineNumber} in '{path}'.");
                 }
 
-                if (!decimal.TryParse(columns[2], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal rate))
+                if (month < 1 || month > 12)
+                {
+                    throw new FormatException(
+                        $"Invalid month value '{columns[1]}' on line {lineNumber} in '{path}'.");
+                }
+
+                if (!TryParseDecimalFlexible(returnToken, out decimal rate))
                 {
                     throw new FormatException(
                         $"Invalid return value '{columns[2]}' on line {lineNumber} in '{path}'.");
                 }
 
                 var period = new YearMonth(year, month);
-                var monthlyReturn = new MonthlyReturn(period, rate);
-
-                items.Add(monthlyReturn);
+                items.Add(new MonthlyReturn(period, rate));
             }
 
             return new AssetReturnSeries(assetKind, items);
+        }
+
+        private static string? ReadNextNonIgnorableLine(StreamReader reader, ref int lineNumber)
+        {
+            string? line;
+            while ((line = reader.ReadLine()) is not null)
+            {
+                lineNumber++;
+
+                if (!IsIgnorableLine(line))
+                {
+                    return line;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsIgnorableLine(string line)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                return true;
+            }
+
+            string trimmed = line.TrimStart();
+
+            return trimmed.StartsWith('#')
+                || trimmed.StartsWith("//", StringComparison.Ordinal);
+        }
+
+        private static char DetectDelimiter(string headerLine)
+        {
+            // Prefer the delimiter that appears more often.
+            int semicolons = 0;
+            int commas = 0;
+
+            foreach (char c in headerLine)
+            {
+                if (c == ';')
+                {
+                    semicolons++;
+                }
+                else if (c == ',')
+                {
+                    commas++;
+                }
+            }
+
+            return semicolons > commas ? ';' : ',';
+        }
+
+        private static bool IsValidHeader(string[] columns)
+        {
+            if (columns.Length < 3)
+            {
+                return false;
+            }
+
+            string c0 = NormalizeHeaderToken(columns[0]);
+            string c1 = NormalizeHeaderToken(columns[1]);
+            string c2 = NormalizeHeaderToken(columns[2]);
+
+            return string.Equals(c0, "Year", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(c1, "Month", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(c2, "Return", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeHeaderToken(string token)
+        {
+            string value = NormalizeToken(token);
+
+            // Handle potential UTF-8 BOM at the beginning of the first header column.
+            if (value.Length > 0 && value[0] == '\uFEFF')
+            {
+                value = value[1..];
+            }
+
+            return value.Trim();
+        }
+
+        private static string NormalizeToken(string token)
+        {
+            string value = token.Trim();
+
+            // If token is still quoted (edge cases), unquote it.
+            if (value.Length >= 2 && value[0] == '"' && value[^1] == '"')
+            {
+                value = value[1..^1];
+            }
+
+            value = value.Trim();
+
+            return value;
+        }
+
+        private static string StripTrailingComment(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            int hashIndex = value.IndexOf('#');
+            int slashIndex = value.IndexOf("//", StringComparison.Ordinal);
+
+            int cutIndex = -1;
+
+            if (hashIndex >= 0)
+            {
+                cutIndex = hashIndex;
+            }
+
+            if (slashIndex >= 0)
+            {
+                cutIndex = cutIndex < 0 ? slashIndex : Math.Min(cutIndex, slashIndex);
+            }
+
+            if (cutIndex >= 0)
+            {
+                value = value[..cutIndex];
+            }
+
+            return value.Trim();
+        }
+
+        private static bool TryParseDecimalFlexible(string token, out decimal value)
+        {
+            string trimmed = token.Trim();
+
+            bool hasComma = trimmed.Contains(',', StringComparison.Ordinal);
+            bool hasDot = trimmed.Contains('.', StringComparison.Ordinal);
+
+            // Critical: when only comma is present, treat it as DECIMAL separator,
+            // not as thousands separator (InvariantCulture would parse "0,02" as 2).
+            if (hasComma && !hasDot)
+            {
+                if (decimal.TryParse(trimmed, DecimalStyles, CommaDecimalCulture, out value))
+                {
+                    return true;
+                }
+
+                string normalized = trimmed.Replace(',', '.');
+                if (decimal.TryParse(normalized, DecimalStyles, InvariantCulture, out value))
+                {
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            // Mixed separators: allow common thousands+decimal patterns.
+            if (hasComma && hasDot)
+            {
+                if (decimal.TryParse(trimmed, NumberStyles.Number, InvariantCulture, out value))
+                {
+                    return true;
+                }
+
+                if (decimal.TryParse(trimmed, NumberStyles.Number, CommaDecimalCulture, out value))
+                {
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            // Dot-only or plain number.
+            if (decimal.TryParse(trimmed, DecimalStyles, InvariantCulture, out value))
+            {
+                return true;
+            }
+
+            if (decimal.TryParse(trimmed, DecimalStyles, CommaDecimalCulture, out value))
+            {
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        private static string[] SplitCsvLine(string line, char delimiter)
+        {
+            // Minimal CSV splitter: supports quoting with double quotes and escaped quotes ("").
+            // It is sufficient for our tested scenarios.
+            var results = new List<string>();
+            var current = new StringBuilder();
+            bool inQuotes = false;
+
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+
+                if (c == '"')
+                {
+                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        // Escaped quote inside a quoted value.
+                        current.Append('"');
+                        i++;
+                        continue;
+                    }
+
+                    inQuotes = !inQuotes;
+                    continue;
+                }
+
+                if (!inQuotes && c == delimiter)
+                {
+                    results.Add(current.ToString());
+                    current.Clear();
+                    continue;
+                }
+
+                current.Append(c);
+            }
+
+            results.Add(current.ToString());
+
+            return results.ToArray();
         }
     }
 }

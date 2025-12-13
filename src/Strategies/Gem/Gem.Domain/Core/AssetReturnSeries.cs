@@ -53,35 +53,61 @@ namespace Gem.Domain.Core
                 throw new DomainValidationException("Return series is empty.");
             }
 
-            var eligibleCount = 0;
+            int endIndex = FindIndexOfPeriod(endPeriod);
 
-            for (var index = 0; index < _returns.Count; index++)
-            {
-                if (_returns[index].Period.CompareTo(endPeriod) <= 0)
-                {
-                    eligibleCount++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            if (eligibleCount < lookbackMonths)
+            if (endIndex < 0)
             {
                 throw new DomainValidationException(
+                    $"Return series does not contain end period {endPeriod.Year}-{endPeriod.Month:00}.");
+            }
+
+            int startIndex = endIndex - lookbackMonths + 1;
+
+            if (startIndex < 0)
+            {
+                throw new InsufficientHistoryException(
                     "Not enough data points to build the requested lookback window.");
             }
 
-            var startIndex = eligibleCount - lookbackMonths;
+            for (int i = startIndex + 1; i <= endIndex; i++)
+            {
+                YearMonth expected = _returns[i - 1].Period.AddMonths(1);
+
+                if (_returns[i].Period != expected)
+                {
+                    throw new NonConsecutivePeriodsException(
+                        "Return series contains a gap inside the requested lookback window.");
+                }
+            }
+
             var result = new MonthlyReturn[lookbackMonths];
 
-            for (var i = 0; i < lookbackMonths; i++)
+            for (int i = 0; i < lookbackMonths; i++)
             {
                 result[i] = _returns[startIndex + i];
             }
 
             return result;
+        }
+
+        private int FindIndexOfPeriod(YearMonth period)
+        {
+            for (int i = 0; i < _returns.Count; i++)
+            {
+                int comparison = _returns[i].Period.CompareTo(period);
+
+                if (comparison == 0)
+                {
+                    return i;
+                }
+
+                if (comparison > 0)
+                {
+                    break;
+                }
+            }
+
+            return -1;
         }
     }
 }

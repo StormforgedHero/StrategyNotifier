@@ -84,7 +84,7 @@ namespace Gem.Domain.Tests.Core
         }
 
         [Fact]
-        public void GetLookbackWindow_NotEnoughData_ThrowsDomainValidationException()
+        public void GetLookbackWindow_NotEnoughData_ThrowsInsufficientHistoryException()
         {
             // Arrange
             var returns = new[]
@@ -98,7 +98,68 @@ namespace Gem.Domain.Tests.Core
             const int lookbackMonths = 3;
 
             // Act & Assert
+            Assert.Throws<InsufficientHistoryException>(
+                () => series.GetLookbackWindow(endPeriod, lookbackMonths));
+        }
+
+        [Fact]
+        public void GetLookbackWindow_WhenEndPeriodIsMissing_ThrowsDomainValidationException()
+        {
+            // Arrange
+            var returns = new[]
+            {
+                new MonthlyReturn(new YearMonth(2025, 1), 0.01m),
+                new MonthlyReturn(new YearMonth(2025, 2), 0.02m)
+            };
+
+            var series = new AssetReturnSeries(AssetKind.UsEquity, returns);
+            var endPeriod = new YearMonth(2025, 3);
+
+            // Act & Assert
             Assert.Throws<DomainValidationException>(
+                () => series.GetLookbackWindow(endPeriod, lookbackMonths: 2));
+        }
+
+        [Fact]
+        public void GetLookbackWindow_WhenLookbackWindowHasGap_ThrowsDomainValidationExceptionOrDerived()
+        {
+            // Arrange
+            var returns = new[]
+            {
+                new MonthlyReturn(new YearMonth(2025, 1), 0.01m),
+                new MonthlyReturn(new YearMonth(2025, 2), 0.02m),
+                // Missing 2025-03
+                new MonthlyReturn(new YearMonth(2025, 4), 0.03m)
+            };
+
+            var series = new AssetReturnSeries(AssetKind.UsEquity, returns);
+            var endPeriod = new YearMonth(2025, 4);
+
+            // Act
+            DomainValidationException ex = Assert.ThrowsAny<DomainValidationException>(
+                () => series.GetLookbackWindow(endPeriod, lookbackMonths: 3));
+
+            // Assert
+            Assert.Contains("gap", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void GetLookbackWindow_GapInPeriods_ThrowsNonConsecutivePeriodsException()
+        {
+            // Arrange
+            var returns = new[]
+            {
+                new MonthlyReturn(new YearMonth(2025, 1), 0.01m),
+                new MonthlyReturn(new YearMonth(2025, 3), 0.02m), // Gap: missing 2025-02
+                new MonthlyReturn(new YearMonth(2025, 4), 0.03m)
+            };
+
+            var series = new AssetReturnSeries(AssetKind.UsEquity, returns);
+            var endPeriod = new YearMonth(2025, 4);
+            const int lookbackMonths = 3;
+
+            // Act & Assert
+            Assert.Throws<NonConsecutivePeriodsException>(
                 () => series.GetLookbackWindow(endPeriod, lookbackMonths));
         }
 
