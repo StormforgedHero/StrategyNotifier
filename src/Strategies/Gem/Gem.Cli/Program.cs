@@ -1,6 +1,7 @@
 using Gem.Cli.Configuration;
 using Gem.Cli.Execution;
 using Gem.Domain.Exceptions;
+using Gem.Domain.Model;
 
 namespace Gem.Cli
 {
@@ -25,16 +26,21 @@ namespace Gem.Cli
             return Run(
                 workingDirectory: Directory.GetCurrentDirectory(),
                 output: Console.Out,
-                error: Console.Error);
+                error: Console.Error,
+                args: args);
         }
 
-        public static int Run(string workingDirectory, TextWriter output, TextWriter error)
+        public static int Run(string workingDirectory, TextWriter output, TextWriter error, string[]? args = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(workingDirectory);
             ArgumentNullException.ThrowIfNull(output);
             ArgumentNullException.ThrowIfNull(error);
 
-            string configPath = Path.Combine(workingDirectory, "config", "gem", "gem.cli.json");
+            args ??= Array.Empty<string>();
+            bool skipUpdate = args.Contains("--no-update", StringComparer.OrdinalIgnoreCase);
+            bool forceUpdate = args.Contains("--force-update", StringComparer.OrdinalIgnoreCase);
+
+            string configPath = Path.Combine(workingDirectory, "config", "gem", "gem.config.json");
 
             GemCliConfiguration configuration;
 
@@ -56,19 +62,20 @@ namespace Gem.Cli
                 return ExitCodeConfigurationError;
             }
 
-            NormalizePaths(configuration, workingDirectory);
+            configuration.NormalizePaths(workingDirectory);
 
             try
             {
                 var runner = new GemRunner(configuration);
-                int signalCount = runner.Run();
+                IReadOnlyList<Signal> signals = runner.Run(skipUpdate, forceUpdate);
 
                 output.WriteLine("StrategyNotifier - GEM CLI");
-                output.WriteLine($"Configuration file       : {configPath}");
-                output.WriteLine($"Data directory           : {configuration.DataDirectory}");
-                output.WriteLine($"Output file              : {configuration.OutputSignalsFile}");
-                output.WriteLine($"Lookback window (months) : {configuration.LookbackMonths}");
-                output.WriteLine($"Generated signals        : {signalCount}");
+                output.WriteLine($"Configuration file   : {configPath}");
+                output.WriteLine($"Data directory       : {configuration.DataDirectory}");
+                output.WriteLine($"Output file          : {configuration.OutputSignalsFile}");
+                output.WriteLine($"Momentum window      : {configuration.Portfolio.Momentum.WindowMonths} months");
+                output.WriteLine($"Update enabled       : {configuration.Update.Enabled && !skipUpdate}");
+                output.WriteLine($"Generated signals    : {signals.Count}");
 
                 return ExitCodeSuccess;
             }
@@ -114,22 +121,6 @@ namespace Gem.Cli
                 error.WriteLine(ex.Message);
                 return ExitCodeUnexpectedError;
             }
-        }
-
-        private static void NormalizePaths(GemCliConfiguration configuration, string workingDirectory)
-        {
-            configuration.DataDirectory = NormalizePath(configuration.DataDirectory, workingDirectory);
-            configuration.OutputSignalsFile = NormalizePath(configuration.OutputSignalsFile, workingDirectory);
-        }
-
-        private static string NormalizePath(string value, string workingDirectory)
-        {
-            if (Path.IsPathRooted(value))
-            {
-                return Path.GetFullPath(value);
-            }
-
-            return Path.GetFullPath(Path.Combine(workingDirectory, value));
         }
     }
 }

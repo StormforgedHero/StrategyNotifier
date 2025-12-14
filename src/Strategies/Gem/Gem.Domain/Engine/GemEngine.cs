@@ -1,120 +1,137 @@
-﻿using Gem.Domain.Core;
+using System.Globalization;
 using Gem.Domain.Exceptions;
 using Gem.Domain.Model;
+using Gem.Domain.Pricing;
 
 namespace Gem.Domain.Engine
 {
-    /// <summary>
-    /// Provides methods for generating GEM strategy signals based on
-    /// monthly return series for US equity, ex-US equity and a safe asset.
-    /// </summary>
     public sealed class GemEngine
     {
-        /// <summary>
-        /// Generates GEM signals for all periods where sufficient history
-        /// is available for all three assets.
-        /// </summary>
-        /// <param name="input">Input data containing return series for all assets.</param>
-        /// <param name="parameters">GEM strategy parameters.</param>
-        /// <returns>
-        /// A list of <see cref="GemSignal"/> instances ordered by period in ascending order.
-        /// If there is not enough data to build any lookback window, an empty list is returned.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown when <paramref name="input"/> or <paramref name="parameters"/> is <c>null</c>.
-        /// </exception>
-        public IReadOnlyList<GemSignal> GenerateSignals(GemInputData input, GemParameters parameters)
+        private readonly IPriceSeriesRepository _repository;
+
+        public GemEngine(IPriceSeriesRepository repository)
         {
-            ArgumentNullException.ThrowIfNull(input);
-            ArgumentNullException.ThrowIfNull(parameters);
-
-            if (input.UsEquity.Returns.Count == 0
-                || input.ExUsEquity.Returns.Count == 0
-                || input.SafeAsset.Returns.Count == 0)
-            {
-                return Array.Empty<GemSignal>();
-            }
-
-            int lookbackMonths = parameters.LookbackMonths;
-
-            YearMonth[] candidatePeriods = GetCandidatePeriods(input);
-
-            var signals = new List<GemSignal>();
-
-            foreach (YearMonth period in candidatePeriods)
-            {
-                IReadOnlyList<MonthlyReturn> usWindow;
-                IReadOnlyList<MonthlyReturn> exUsWindow;
-                IReadOnlyList<MonthlyReturn> safeWindow;
-
-                try
-                {
-                    usWindow = input.UsEquity.GetLookbackWindow(period, lookbackMonths);
-                    exUsWindow = input.ExUsEquity.GetLookbackWindow(period, lookbackMonths);
-                    safeWindow = input.SafeAsset.GetLookbackWindow(period, lookbackMonths);
-                }
-                catch (InsufficientHistoryException)
-                {
-                    // Not enough history to build the lookback window for at least one series
-                    // for this period. Such periods are skipped.
-                    continue;
-                }
-                catch (NonConsecutivePeriodsException)
-                {
-                    // The lookback window contains a gap (non-consecutive periods).
-                    // Such periods are skipped to allow generating signals where possible.
-                    continue;
-                }
-
-                decimal usMomentum = SumRates(usWindow);
-                decimal exUsMomentum = SumRates(exUsWindow);
-                decimal safeMomentum = SumRates(safeWindow);
-
-                AssetKind relativeWinnerKind = AssetKind.UsEquity;
-                decimal relativeWinnerMomentum = usMomentum;
-
-                if (exUsMomentum > usMomentum)
-                {
-                    relativeWinnerKind = AssetKind.ExUsEquity;
-                    relativeWinnerMomentum = exUsMomentum;
-                }
-
-                AssetKind position = relativeWinnerMomentum > safeMomentum
-                    ? relativeWinnerKind
-                    : AssetKind.SafeAsset;
-
-                signals.Add(new GemSignal(period, position));
-            }
-
-            return signals;
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        private static YearMonth[] GetCandidatePeriods(GemInputData input)
+        public Signal GenerateSignal(DateOnly asOfDate, PortfolioConfiguration portfolio)
         {
-            IEnumerable<YearMonth> usPeriods = input.UsEquity.Returns.Select(r => r.Period);
-            IEnumerable<YearMonth> exUsPeriods = input.ExUsEquity.Returns.Select(r => r.Period);
-            IEnumerable<YearMonth> safePeriods = input.SafeAsset.Returns.Select(r => r.Period);
+            ArgumentNullException.ThrowIfNull(portfolio);
 
-            YearMonth[] candidatePeriods = usPeriods
-                .Intersect(exUsPeriods)
-                .Intersect(safePeriods)
-                .Distinct()
-                .OrderBy(period => period)
-                .ToArray();
+            int windowMonths = portfolio.Momentum.WindowMonths;
 
-            return candidatePeriods;
-        }
+            var riskOnResults = new List<(Instrument Instrument, decimal Return)>();
 
-        private static decimal SumRates(IEnumerable<MonthlyReturn> window)
-        {
-            decimal sum = 0m;
-
-            foreach (MonthlyReturn monthlyReturn in window)
+            foreach (Instrument instrument in portfolio.RiskOnInstruments)
             {
-                sum += monthlyReturn.Rate;
+                IReadOnlyList<PricePoint> series = _repository.GetSeries(instrument);
+                decimal momentum = CalculateReturn(series, asOfDate, windowMonths);
+                riskOnResults.Add((instrument, momentum));
             }
 
-            return sum;
+            (Instrument Instrument, decimal Return) leader = riskOnResults
+                .OrderByDescending(item => item.Return)
+                .First();
+
+            bool isRiskOn = !portfolio.Momentum.UseAbsoluteMomentum
+                || leader.Return > portfolio.Momentum.AbsoluteThreshold;
+
+            IReadOnlyList<Allocation> allocations = isRiskOn
+                ? BuildRiskOnAllocations(riskOnResults, portfolio.Momentum)
+                : new[] { new Allocation(portfolio.RiskOffInstrument, 1m) };
+
+            int relativeRank = GetRelativeRank(riskOnResults, leader.Instrument);
+            string comment = BuildComment(leader, isRiskOn);
+
+            return new Signal(
+                date: asOfDate,
+                windowMonths: windowMonths,
+                isRiskOn: isRiskOn,
+                allocations: allocations,
+                absoluteReturn: leader.Return,
+                relativeRank: relativeRank,
+                comment: comment);
+        }
+
+        private static decimal CalculateReturn(
+            IReadOnlyList<PricePoint> series,
+            DateOnly asOfDate,
+            int windowMonths)
+        {
+            if (series.Count == 0)
+            {
+                throw new DomainValidationException("Price series is empty.");
+            }
+
+            PricePoint? end = series.LastOrDefault(p => p.Date <= asOfDate);
+
+            if (end is null)
+            {
+                throw new DomainValidationException($"No price data on or before {asOfDate:yyyy-MM-dd}.");
+            }
+
+            DateOnly startCandidateDate = asOfDate.AddMonths(-windowMonths);
+            PricePoint? start = series.LastOrDefault(p => p.Date <= startCandidateDate);
+
+            if (start is null)
+            {
+                throw new DomainValidationException(
+                    $"Insufficient history to build a {windowMonths}-month window ending at {asOfDate:yyyy-MM-dd}.");
+            }
+
+            if (start.Close == 0m)
+            {
+                throw new DomainValidationException("Start price is zero, cannot compute return.");
+            }
+
+            return end.Close / start.Close - 1m;
+        }
+
+        private static IReadOnlyList<Allocation> BuildRiskOnAllocations(
+            IReadOnlyList<(Instrument Instrument, decimal Return)> ranked,
+            MomentumParameters parameters)
+        {
+            var sorted = ranked
+                .OrderByDescending(item => item.Return)
+                .ToList();
+
+            if (parameters.RankingMode == RankingMode.Top2 && sorted.Count >= 2)
+            {
+                return new[]
+                {
+                    new Allocation(sorted[0].Instrument, 0.5m),
+                    new Allocation(sorted[1].Instrument, 0.5m)
+                };
+            }
+
+            return new[] { new Allocation(sorted[0].Instrument, 1m) };
+        }
+
+        private static string BuildComment((Instrument Instrument, decimal Return) leader, bool isRiskOn)
+        {
+            string direction = isRiskOn ? "risk-on" : "risk-off";
+            string formattedReturn = leader.Return.ToString("P2", CultureInfo.InvariantCulture);
+            return $"{leader.Instrument.Ticker} return {formattedReturn} => {direction}";
+        }
+
+        private static int GetRelativeRank(
+            IReadOnlyList<(Instrument Instrument, decimal Return)> ranked,
+            Instrument leader)
+        {
+            var sorted = ranked
+                .OrderByDescending(item => item.Return)
+                .ToList();
+
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (ReferenceEquals(sorted[i].Instrument, leader)
+                    || string.Equals(sorted[i].Instrument.Ticker, leader.Ticker, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i + 1;
+                }
+            }
+
+            return 1;
         }
     }
 }
