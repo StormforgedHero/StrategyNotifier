@@ -1,4 +1,4 @@
-﻿using System.Text;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.EntryPoint.Output
 {
@@ -7,86 +7,72 @@ namespace Gem.Cli.Tests.EntryPoint.Output
         [Fact]
         public void Run_OnSuccess_WritesExpectedSummaryLinesToStdout()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
 
-                string stdout = outWriter.ToString();
-                Assert.False(string.IsNullOrWhiteSpace(stdout));
+            string stdout = outWriter.ToString();
+            Assert.False(string.IsNullOrWhiteSpace(stdout));
 
-                string[] lines = SplitNonEmptyLines(stdout);
+            string[] lines = SplitNonEmptyLines(stdout);
 
-                Assert.Equal("StrategyNotifier - GEM CLI", lines[0]);
+            Assert.Equal("StrategyNotifier - GEM CLI", lines[0]);
 
-                string configPath = GetValue(lines, "Configuration file");
-                string dataDirectory = GetValue(lines, "Data directory");
-                string outputFile = GetValue(lines, "Output file");
-                string lookback = GetValue(lines, "Lookback window (months)");
-                string generated = GetValue(lines, "Generated signals");
+            string configPath = GetValue(lines, "Configuration file");
+            string dataDirectory = GetValue(lines, "Data directory");
+            string outputFile = GetValue(lines, "Output file");
+            string lookback = GetValue(lines, "Lookback window (months)");
+            string generated = GetValue(lines, "Generated signals");
 
-                Assert.True(Path.IsPathRooted(configPath));
-                Assert.True(Path.IsPathRooted(dataDirectory));
-                Assert.True(Path.IsPathRooted(outputFile));
+            Assert.True(Path.IsPathRooted(configPath));
+            Assert.True(Path.IsPathRooted(dataDirectory));
+            Assert.True(Path.IsPathRooted(outputFile));
 
-                Assert.Contains(
-                    Path.Combine("config", "gem", "gem.cli.json"),
-                    configPath,
-                    StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(
+                Path.Combine("config", "gem", "gem.cli.json"),
+                configPath,
+                StringComparison.OrdinalIgnoreCase);
 
-                Assert.Contains(
-                    Path.Combine("data", "gem", "sample"),
-                    dataDirectory,
-                    StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(
+                Path.Combine("data", "gem", "sample"),
+                dataDirectory,
+                StringComparison.OrdinalIgnoreCase);
 
-                Assert.Contains(
-                    Path.Combine("dist", "gem", "signals.json"),
-                    outputFile,
-                    StringComparison.OrdinalIgnoreCase);
+            Assert.Contains(
+                Path.Combine("dist", "gem", "signals.json"),
+                outputFile,
+                StringComparison.OrdinalIgnoreCase);
 
-                Assert.Equal("2", lookback);
+            Assert.Equal("2", lookback);
 
-                Assert.True(int.TryParse(generated, out int signalCount));
-                Assert.True(signalCount > 0);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.True(int.TryParse(generated, out int signalCount));
+            Assert.True(signalCount > 0);
         }
 
         [Fact]
         public void Run_OnSuccess_DoesNotWriteErrorsToStderr()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
         }
 
         private static string[] SplitNonEmptyLines(string text)
@@ -123,13 +109,8 @@ namespace Gem.Cli.Tests.EntryPoint.Output
             throw new InvalidOperationException($"Expected output line with label '{label}' was not found.");
         }
 
-        private static void CreateValidConfiguration(string rootDirectory, int lookbackMonths)
+        private static void CreateValidConfiguration(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
   ""usEquityFile"": ""us-equity.csv"",
@@ -139,86 +120,37 @@ namespace Gem.Cli.Tests.EntryPoint.Output
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static void CreateSampleDataFiles(string rootDirectory)
+        private static void CreateSampleDataFiles(TemporaryWorkspace workspace)
         {
-            string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-            Directory.CreateDirectory(dataDirectory);
-
-            WriteCsv(
-                dataDirectory,
-                "us-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.02
                 2025,2,0.03
                 2025,3,-0.01
-                """);
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "exus-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.01
                 2025,2,0.02
                 2025,3,0.00
-                """);
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "safe-asset.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.002
                 2025,2,0.002
                 2025,3,0.002
-                """);
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(
-                fullPath,
-                content.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
         }
     }
 }

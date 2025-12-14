@@ -1,5 +1,5 @@
-﻿using Gem.Cli.Contracts;
-using System.Text;
+using Gem.Cli.Contracts;
+using Gem.Cli.Tests.TestSupport;
 using System.Text.Json;
 
 namespace Gem.Cli.Tests.EntryPoint.Flow
@@ -36,9 +36,10 @@ namespace Gem.Cli.Tests.EntryPoint.Flow
         public void Run_WhenOutputWriterIsNull_ThrowsArgumentNullException()
         {
             using var errWriter = new StringWriter();
+            using var workspace = new TemporaryWorkspace();
 
             var exception = Assert.Throws<ArgumentNullException>(
-                () => Cli.Program.Run(CreateTemporaryDirectory(), output: null!, error: errWriter));
+                () => Cli.Program.Run(workspace.Root, output: null!, error: errWriter));
 
             Assert.Equal("output", exception.ParamName);
         }
@@ -47,9 +48,10 @@ namespace Gem.Cli.Tests.EntryPoint.Flow
         public void Run_WhenErrorWriterIsNull_ThrowsArgumentNullException()
         {
             using var outWriter = new StringWriter();
+            using var workspace = new TemporaryWorkspace();
 
             var exception = Assert.Throws<ArgumentNullException>(
-                () => Cli.Program.Run(CreateTemporaryDirectory(), output: outWriter, error: null!));
+                () => Cli.Program.Run(workspace.Root, output: outWriter, error: null!));
 
             Assert.Equal("error", exception.ParamName);
         }
@@ -57,260 +59,195 @@ namespace Gem.Cli.Tests.EntryPoint.Flow
         [Fact]
         public void Run_WhenConfigurationFileIsMissing_ReturnsNonZeroAndWritesConfigurationFileNotFound()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.NotEqual(0, exitCode);
-                Assert.Contains("Configuration file not found", errWriter.ToString(), StringComparison.Ordinal);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.NotEqual(0, exitCode);
+            Assert.Contains("Configuration file not found", errWriter.ToString(), StringComparison.Ordinal);
         }
 
         [Fact]
         public void Run_WhenConfigurationJsonIsInvalid_ReturnsNonZeroAndWritesConfigurationError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                WriteConfigurationFile(
-                    rootDirectory,
-                    """
-                    {
-                      "dataDirectory": "data/gem/sample"
-                    """); // Missing closing brace -> invalid JSON.
+            WriteConfigurationFile(
+                workspace,
+                """
+                {
+                  "dataDirectory": "data/gem/sample"
+                """); // Missing closing brace -> invalid JSON.
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.NotEqual(0, exitCode);
+            Assert.NotEqual(0, exitCode);
 
-                string error = errWriter.ToString();
-                Assert.Contains("Configuration error", error, StringComparison.Ordinal);
-                Assert.Contains("invalid JSON", error, StringComparison.OrdinalIgnoreCase);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string error = errWriter.ToString();
+            Assert.Contains("Configuration error", error, StringComparison.Ordinal);
+            Assert.Contains("invalid JSON", error, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
         public void Run_DoesNotChangeProcessCurrentDirectory_OnSuccessfulRun()
         {
-            string originalCurrentDirectory = Directory.GetCurrentDirectory();
-            string runnerCurrentDirectory = CreateTemporaryDirectory();
-            string rootDirectory = CreateTemporaryDirectory();
+            using var runnerWorkspace = new TemporaryWorkspace();
+            using var rootWorkspace = new TemporaryWorkspace();
 
-            try
+            using (new CurrentDirectoryScope(runnerWorkspace.Root))
             {
-                Directory.SetCurrentDirectory(runnerCurrentDirectory);
-
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+                CreateConfigurationFile(rootWorkspace, lookbackMonths: 2);
+                CreateSampleDataFiles(rootWorkspace);
 
                 using var outWriter = new StringWriter();
                 using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+                int exitCode = Cli.Program.Run(rootWorkspace.Root, outWriter, errWriter);
 
                 Assert.Equal(0, exitCode);
-                Assert.Equal(runnerCurrentDirectory, Directory.GetCurrentDirectory());
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(originalCurrentDirectory);
-                DeleteDirectoryIfExists(runnerCurrentDirectory);
-                DeleteDirectoryIfExists(rootDirectory);
+                Assert.Equal(runnerWorkspace.Root, Directory.GetCurrentDirectory());
             }
         }
 
         [Fact]
         public void Run_WithRelativePaths_NormalizesAndCreatesSignalsUnderWorkingDirectory()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+            CreateConfigurationFile(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
 
-                string expectedOutputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-                Assert.True(File.Exists(expectedOutputPath));
+            string expectedOutputPath = workspace.GetPath("dist", "gem", "signals.json");
+            Assert.True(File.Exists(expectedOutputPath));
 
-                string json = File.ReadAllText(expectedOutputPath, Encoding.UTF8);
+            string json = File.ReadAllText(expectedOutputPath, Utf8TestEncoding.Utf8NoBom);
 
-                GemSignalOutput[]? signals =
-                    JsonSerializer.Deserialize<GemSignalOutput[]>(json);
+            GemSignalOutput[]? signals =
+                JsonSerializer.Deserialize<GemSignalOutput[]>(json);
 
-                Assert.NotNull(signals);
-                Assert.NotEmpty(signals!);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.NotNull(signals);
+            Assert.NotEmpty(signals!);
         }
 
         [Fact]
         public void Run_WhenInputDataFileIsMissing_ReturnsNonZeroAndWritesInputDataFileNotFound()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 2);
+            CreateConfigurationFile(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            string dataDirectory = workspace.GetPath("data", "gem", "sample");
+            Directory.CreateDirectory(dataDirectory);
 
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.02
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.02
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                // safe-asset.csv intentionally missing.
+            // safe-asset.csv intentionally missing.
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.NotEqual(0, exitCode);
+            Assert.NotEqual(0, exitCode);
 
-                string error = errWriter.ToString();
-                Assert.Contains("Input data file not found", error, StringComparison.Ordinal);
-                Assert.Contains("safe-asset.csv", error, StringComparison.OrdinalIgnoreCase);
+            string error = errWriter.ToString();
+            Assert.Contains("Input data file not found", error, StringComparison.Ordinal);
+            Assert.Contains("safe-asset.csv", error, StringComparison.OrdinalIgnoreCase);
 
-                string outputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-                Assert.False(File.Exists(outputPath));
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string outputPath = workspace.GetPath("dist", "gem", "signals.json");
+            Assert.False(File.Exists(outputPath));
         }
 
         [Fact]
         public void Run_WhenLookbackExceedsAvailableData_ReturnsZeroAndWritesEmptySignalsFile()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 12);
-                CreateSampleDataFiles(rootDirectory);
+            CreateConfigurationFile(workspace, lookbackMonths: 12);
+            CreateSampleDataFiles(workspace);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
 
-                string output = outWriter.ToString();
-                Assert.Contains("Generated signals", output, StringComparison.Ordinal);
-                Assert.Contains("0", output, StringComparison.Ordinal);
+            string output = outWriter.ToString();
+            Assert.Contains("Generated signals", output, StringComparison.Ordinal);
+            Assert.Contains("0", output, StringComparison.Ordinal);
 
-                string outputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-                Assert.True(File.Exists(outputPath));
+            string outputPath = workspace.GetPath("dist", "gem", "signals.json");
+            Assert.True(File.Exists(outputPath));
 
-                string json = File.ReadAllText(outputPath, Encoding.UTF8);
-                Assert.Equal("[]", json.Trim());
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string json = File.ReadAllText(outputPath, Utf8TestEncoding.Utf8NoBom);
+            Assert.Equal("[]", json.Trim());
         }
 
-        private static void CreateSampleDataFiles(string rootDirectory)
+        private static void CreateSampleDataFiles(TemporaryWorkspace workspace)
         {
-            string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-            Directory.CreateDirectory(dataDirectory);
-
-            WriteCsv(
-                dataDirectory,
-                "us-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.02
                 2025,2,0.03
                 2025,3,-0.01
-                """);
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "exus-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.01
                 2025,2,0.02
                 2025,3,0.00
-                """);
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "safe-asset.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.002
                 2025,2,0.002
                 2025,3,0.002
-                """);
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
         }
 
-        private static void WriteConfigurationFile(string rootDirectory, string jsonConfig)
+        private static void WriteConfigurationFile(TemporaryWorkspace workspace, string jsonConfig)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
-            File.WriteAllText(
-                configPath,
-                jsonConfig.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static void CreateConfigurationFile(string rootDirectory, int lookbackMonths)
+        private static void CreateConfigurationFile(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
             // Intentionally relative paths to verify normalization inside Program.Run.
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
@@ -321,47 +258,7 @@ namespace Gem.Cli.Tests.EntryPoint.Flow
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(fullPath, content.Trim() + Environment.NewLine, Encoding.UTF8);
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Gem.Cli.Tests.Execution
             Assert.True(signalCount > 0);
             Assert.True(File.Exists(context.OutputPath));
 
-            string json = ReadJson(context.OutputPath);
+            string json = ReadJson(context.OutputPath, context.Workspace);
             List<GemSignalOutput> outputs = DeserializeOutputs(json);
 
             Assert.Equal(signalCount, outputs.Count);
@@ -41,7 +41,7 @@ namespace Gem.Cli.Tests.Execution
             Assert.Equal(2, signalCount);
             Assert.True(File.Exists(context.OutputPath));
 
-            string json = ReadJson(context.OutputPath);
+            string json = ReadJson(context.OutputPath, context.Workspace);
             List<GemSignalOutput> outputs = DeserializeOutputs(json);
 
             Assert.Equal(signalCount, outputs.Count);
@@ -66,7 +66,7 @@ namespace Gem.Cli.Tests.Execution
             Assert.Equal(2, signalCount);
             Assert.True(File.Exists(context.OutputPath));
 
-            string json = ReadJson(context.OutputPath);
+            string json = ReadJson(context.OutputPath, context.Workspace);
             List<GemSignalOutput> outputs = DeserializeOutputs(json);
 
             Assert.Equal(signalCount, outputs.Count);
@@ -119,7 +119,7 @@ namespace Gem.Cli.Tests.Execution
             Assert.Equal(2, signalCount);
             Assert.True(File.Exists(context.OutputPath));
 
-            byte[] bytes = TestFileSystem.ReadAllBytes(context.OutputPath);
+            byte[] bytes = context.Workspace.ReadAllBytes("dist", "gem", "signals.json");
 
             // UTF-8 BOM: EF BB BF
             bool hasBom = bytes.Length >= 3
@@ -157,7 +157,7 @@ namespace Gem.Cli.Tests.Execution
             Assert.Equal(2, signalCount);
             Assert.True(File.Exists(context.OutputPath));
 
-            string json = ReadJson(context.OutputPath);
+            string json = ReadJson(context.OutputPath, context.Workspace);
             Assert.DoesNotContain("OLD_CONTENT_SHOULD_BE_OVERWRITTEN", json, StringComparison.Ordinal);
 
             List<GemSignalOutput> outputs = DeserializeOutputs(json);
@@ -171,11 +171,11 @@ namespace Gem.Cli.Tests.Execution
 
             Assert.Equal(2, context.Runner.Run());
 
-            string json1 = ReadJson(context.OutputPath);
+            string json1 = ReadJson(context.OutputPath, context.Workspace);
 
             Assert.Equal(2, context.Runner.Run());
 
-            string json2 = ReadJson(context.OutputPath);
+            string json2 = ReadJson(context.OutputPath, context.Workspace);
 
             Assert.Equal(json1, json2);
         }
@@ -187,7 +187,7 @@ namespace Gem.Cli.Tests.Execution
 
             Assert.Equal(2, context.Runner.Run());
 
-            string json = ReadJson(context.OutputPath);
+            string json = ReadJson(context.OutputPath, context.Workspace);
 
             bool looksIndented = json.Contains("\n  {", StringComparison.Ordinal)
                 || json.Contains("\r\n  {", StringComparison.Ordinal);
@@ -195,9 +195,9 @@ namespace Gem.Cli.Tests.Execution
             Assert.True(looksIndented);
         }
 
-        private static string ReadJson(string path)
+        private static string ReadJson(string path, TemporaryWorkspace workspace)
         {
-            return TestFileSystem.ReadAllText(path);
+            return workspace.ReadAllText("dist", "gem", "signals.json");
         }
 
         private static List<GemSignalOutput> DeserializeOutputs(string json)
@@ -211,6 +211,7 @@ namespace Gem.Cli.Tests.Execution
 
         private sealed class RunnerTestContext : IDisposable
         {
+            public TemporaryWorkspace Workspace { get; }
             public string RootDirectory { get; }
             public string DataDirectory { get; }
             public string OutputPath { get; }
@@ -219,13 +220,14 @@ namespace Gem.Cli.Tests.Execution
             public GemRunner Runner { get; }
 
             private RunnerTestContext(
-                string rootDirectory,
+                TemporaryWorkspace workspace,
                 string dataDirectory,
                 string outputPath,
                 GemCliConfiguration configuration,
                 GemRunner runner)
             {
-                RootDirectory = rootDirectory;
+                Workspace = workspace;
+                RootDirectory = workspace.Root;
                 DataDirectory = dataDirectory;
                 OutputPath = outputPath;
                 DistDirectory = Path.GetDirectoryName(outputPath)!;
@@ -238,12 +240,12 @@ namespace Gem.Cli.Tests.Execution
                 bool createOutputDirectory = false,
                 bool createExistingOutputFile = false)
             {
-                string rootDirectory = TestFileSystem.CreateTemporaryDirectory();
+                var workspace = new TemporaryWorkspace();
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
+                string dataDirectory = workspace.GetPath("data", "gem", "sample");
                 GemCliTestData.WriteDefaultSampleCsvs(dataDirectory);
 
-                string outputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
+                string outputPath = workspace.GetPath("dist", "gem", "signals.json");
 
                 if (createOutputDirectory)
                 {
@@ -252,10 +254,7 @@ namespace Gem.Cli.Tests.Execution
 
                 if (createExistingOutputFile)
                 {
-                    TestFileSystem.WriteTextFile(
-                        Path.GetDirectoryName(outputPath)!,
-                        Path.GetFileName(outputPath),
-                        "OLD_CONTENT_SHOULD_BE_OVERWRITTEN");
+                    workspace.WriteText("OLD_CONTENT_SHOULD_BE_OVERWRITTEN", "dist", "gem", "signals.json");
                 }
 
                 GemCliConfiguration configuration =
@@ -263,12 +262,12 @@ namespace Gem.Cli.Tests.Execution
 
                 var runner = new GemRunner(configuration);
 
-                return new RunnerTestContext(rootDirectory, dataDirectory, outputPath, configuration, runner);
+                return new RunnerTestContext(workspace, dataDirectory, outputPath, configuration, runner);
             }
 
             public void Dispose()
             {
-                TestFileSystem.DeleteDirectoryIfExists(RootDirectory);
+                Workspace.Dispose();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.EntryPoint.InputData
 {
@@ -7,174 +7,125 @@ namespace Gem.Cli.Tests.EntryPoint.InputData
         [Fact]
         public void Main_WithInvalidCsvReturnValue_ReturnsNonZeroAndWritesInputDataFormatError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,not-a-number
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Invalid return in US equity file.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,not-a-number
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                // Other files are valid.
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            Assert.NotEqual(0, exitCode);
 
-                Assert.NotEqual(0, exitCode);
-
-                string error = errWriter.ToString();
-                Assert.Contains("Input data format error", error, StringComparison.Ordinal);
-                Assert.Contains("Invalid return value", error, StringComparison.Ordinal);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string error = errWriter.ToString();
+            Assert.Contains("Input data format error", error, StringComparison.Ordinal);
+            Assert.Contains("Invalid return value", error, StringComparison.Ordinal);
         }
 
         [Fact]
         public void Main_WithInvalidCsvHeader_ReturnsNonZeroAndWritesInputDataFormatError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                BadHeader1,BadHeader2,BadHeader3
+                2025,1,0.02
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Invalid header in US equity file.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    BadHeader1,BadHeader2,BadHeader3
-                    2025,1,0.02
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                // Other files are valid.
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            Assert.NotEqual(0, exitCode);
 
-                Assert.NotEqual(0, exitCode);
-
-                string error = errWriter.ToString();
-                Assert.Contains("Input data format error", error, StringComparison.Ordinal);
-                Assert.Contains("Invalid CSV header", error, StringComparison.Ordinal);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string error = errWriter.ToString();
+            Assert.Contains("Input data format error", error, StringComparison.Ordinal);
+            Assert.Contains("Invalid CSV header", error, StringComparison.Ordinal);
         }
 
         [Fact]
         public void Main_WithMonthOutOfRange_ReturnsNonZeroAndWritesInputDataFormatError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,13,0.02
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Month=13 is out of range.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,13,0.02
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            Assert.NotEqual(0, exitCode);
 
-                Assert.NotEqual(0, exitCode);
-
-                string error = errWriter.ToString();
-                Assert.Contains("Input data format error", error, StringComparison.Ordinal);
-                Assert.Contains("Invalid month value", error, StringComparison.Ordinal);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string error = errWriter.ToString();
+            Assert.Contains("Input data format error", error, StringComparison.Ordinal);
+            Assert.Contains("Invalid month value", error, StringComparison.Ordinal);
         }
 
-        private static void CreateValidConfiguration(string rootDirectory, int lookbackMonths)
+        private static void CreateValidConfiguration(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
   ""usEquityFile"": ""us-equity.csv"",
@@ -184,47 +135,7 @@ namespace Gem.Cli.Tests.EntryPoint.InputData
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(fullPath, content.Trim() + Environment.NewLine);
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
     }
 }

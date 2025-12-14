@@ -38,7 +38,7 @@ namespace Gem.Cli.Tests.EntryPoint.Smoke
 
             Assert.True(File.Exists(context.OutputPath));
 
-            string json = TestFileSystem.ReadAllText(context.OutputPath);
+            string json = File.ReadAllText(context.OutputPath, Utf8TestEncoding.Utf8NoBom);
             GemSignalOutput[]? signals =
                 JsonSerializer.Deserialize<GemSignalOutput[]>(json);
 
@@ -96,77 +96,5 @@ namespace Gem.Cli.Tests.EntryPoint.Smoke
             Assert.Contains("safe-asset.csv", result.Error, StringComparison.OrdinalIgnoreCase);
         }
 
-        private sealed class ProgramTestContext : IDisposable
-        {
-            private const string DefaultDataDirectoryRelative = "data/gem/sample";
-            private const string DefaultOutputSignalsFileRelative = "dist/gem/signals.json";
-
-            public string RootDirectory { get; }
-            public string DataDirectory { get; }
-            public string OutputPath { get; }
-
-            private ProgramTestContext(string rootDirectory)
-            {
-                RootDirectory = rootDirectory;
-                DataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                OutputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-            }
-
-            public static ProgramTestContext Create()
-            {
-                string root = TestFileSystem.CreateTemporaryDirectory();
-                return new ProgramTestContext(root);
-            }
-
-            public ProgramRunResult Run()
-            {
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
-
-                int exitCode = Program.Run(RootDirectory, outWriter, errWriter);
-
-                return new ProgramRunResult(
-                    exitCode,
-                    outWriter.ToString(),
-                    errWriter.ToString());
-            }
-
-            public void WriteValidConfig(int lookbackMonths)
-            {
-                GemCliTestData.WriteGemCliJsonConfig(
-                    RootDirectory,
-                    lookbackMonths: lookbackMonths,
-                    dataDirectory: DefaultDataDirectoryRelative,
-                    outputSignalsFile: DefaultOutputSignalsFileRelative);
-            }
-
-            public void WriteInvalidJsonConfig(string jsonContent)
-            {
-                string configDirectory = Path.Combine(RootDirectory, "config", "gem");
-                Directory.CreateDirectory(configDirectory);
-
-                TestFileSystem.WriteTextFile(configDirectory, "gem.cli.json", jsonContent);
-            }
-
-            public void WriteDefaultSampleData()
-            {
-                GemCliTestData.WriteDefaultSampleCsvs(DataDirectory);
-            }
-
-            public void WriteDataMissingSafeAssetFile()
-            {
-                GemCliTestData.WriteDefaultSampleCsvs(DataDirectory);
-
-                string safeAssetPath = Path.Combine(DataDirectory, "safe-asset.csv");
-                File.Delete(safeAssetPath);
-            }
-
-            public void Dispose()
-            {
-                TestFileSystem.DeleteDirectoryIfExists(RootDirectory);
-            }
-        }
-
-        private sealed record ProgramRunResult(int ExitCode, string Output, string Error);
     }
 }

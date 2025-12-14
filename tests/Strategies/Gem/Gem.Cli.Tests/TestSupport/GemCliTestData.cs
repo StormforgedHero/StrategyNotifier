@@ -6,7 +6,7 @@ namespace Gem.Cli.Tests.TestSupport
     {
         public static void WriteDefaultSampleCsvs(string dataDirectory)
         {
-            TestFileSystem.WriteCsv(
+            WriteCsv(
                 dataDirectory,
                 "us-equity.csv",
                 """
@@ -16,7 +16,7 @@ namespace Gem.Cli.Tests.TestSupport
                 2025,3,-0.01
                 """);
 
-            TestFileSystem.WriteCsv(
+            WriteCsv(
                 dataDirectory,
                 "exus-equity.csv",
                 """
@@ -26,7 +26,7 @@ namespace Gem.Cli.Tests.TestSupport
                 2025,3,0.00
                 """);
 
-            TestFileSystem.WriteCsv(
+            WriteCsv(
                 dataDirectory,
                 "safe-asset.csv",
                 """
@@ -77,7 +77,17 @@ namespace Gem.Cli.Tests.TestSupport
             }
             """;
 
-            TestFileSystem.WriteTextFile(configDirectory, "gem.cli.json", jsonConfig);
+            Utf8TestEncoding.WriteAllTextUtf8NoBom(
+                Path.Combine(configDirectory, "gem.cli.json"),
+                jsonConfig);
+        }
+
+        private static void WriteCsv(string directory, string fileName, string content)
+        {
+            Directory.CreateDirectory(directory);
+
+            string fullPath = Path.Combine(directory, fileName);
+            Utf8TestEncoding.WriteAllTextUtf8NoBom(fullPath, content);
         }
     }
 }

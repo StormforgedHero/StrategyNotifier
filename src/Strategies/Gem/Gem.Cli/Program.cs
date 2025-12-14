@@ -1,4 +1,4 @@
-﻿using Gem.Cli.Configuration;
+using Gem.Cli.Configuration;
 using Gem.Cli.Execution;
 using Gem.Domain.Exceptions;
 
@@ -90,15 +90,23 @@ namespace Gem.Cli
                 error.WriteLine(ex.Message);
                 return ExitCodeInputDataValidationError;
             }
+            catch (GemOutputWriteException ex)
+            {
+                error.WriteLine("Output write error.");
+                error.WriteLine(ex.Message);
+                return ExitCodeOutputWriteError;
+            }
             catch (UnauthorizedAccessException ex)
             {
-                bool isOutputRelated = WriteIoError(error, ex, configuration.OutputSignalsFile);
-                return isOutputRelated ? ExitCodeOutputWriteError : ExitCodeIoError;
+                error.WriteLine("I/O error.");
+                error.WriteLine(ex.Message);
+                return ExitCodeIoError;
             }
             catch (IOException ex)
             {
-                bool isOutputRelated = WriteIoError(error, ex, configuration.OutputSignalsFile);
-                return isOutputRelated ? ExitCodeOutputWriteError : ExitCodeIoError;
+                error.WriteLine("I/O error.");
+                error.WriteLine(ex.Message);
+                return ExitCodeIoError;
             }
             catch (Exception ex)
             {
@@ -122,40 +130,6 @@ namespace Gem.Cli
             }
 
             return Path.GetFullPath(Path.Combine(workingDirectory, value));
-        }
-
-        private static bool WriteIoError(TextWriter error, Exception exception, string outputSignalsFile)
-        {
-            bool isOutputRelated = IsProbablyRelatedToOutput(exception, outputSignalsFile);
-
-            string header = isOutputRelated
-                ? "Output write error."
-                : "I/O error.";
-
-            error.WriteLine(header);
-            error.WriteLine(exception.Message);
-
-            return isOutputRelated;
-        }
-
-        private static bool IsProbablyRelatedToOutput(Exception exception, string outputSignalsFile)
-        {
-            if (string.IsNullOrWhiteSpace(outputSignalsFile))
-            {
-                return false;
-            }
-
-            string message = exception.Message ?? string.Empty;
-
-            if (message.Contains(outputSignalsFile, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            string fileName = Path.GetFileName(outputSignalsFile);
-
-            return !string.IsNullOrWhiteSpace(fileName)
-                && message.Contains(fileName, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.EntryPoint.Output
 {
@@ -7,77 +7,61 @@ namespace Gem.Cli.Tests.EntryPoint.Output
         [Fact]
         public void Run_WhenOutputSignalsFilePathIsDirectory_ReturnsNonZeroAndWritesOutputWriteError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            // Force output path to be a DIRECTORY, not a file.
+            string outputPathAsDirectory = workspace.GetPath("dist", "gem", "signals.json");
+            Directory.CreateDirectory(outputPathAsDirectory);
 
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.02
-                    2025,2,0.03
-                    2025,3,-0.01
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    2025,2,0.02
-                    2025,3,0.00
-                    """);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    2025,2,0.002
-                    2025,3,0.002
-                    """);
+            Assert.NotEqual(0, exitCode);
 
-                // Force output path to be a DIRECTORY, not a file.
-                string outputPathAsDirectory = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-                Directory.CreateDirectory(outputPathAsDirectory);
+            string error = errWriter.ToString();
+            Assert.Contains("Output write error", error, StringComparison.Ordinal);
+            Assert.Contains("signals.json", error, StringComparison.OrdinalIgnoreCase);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
-
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
-
-                Assert.NotEqual(0, exitCode);
-
-                string error = errWriter.ToString();
-                Assert.Contains("Output write error", error, StringComparison.Ordinal);
-                Assert.Contains("signals.json", error, StringComparison.OrdinalIgnoreCase);
-
-                // Still a directory; no file could have been created at that path.
-                Assert.True(Directory.Exists(outputPathAsDirectory));
-                Assert.False(File.Exists(outputPathAsDirectory));
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.True(Directory.Exists(outputPathAsDirectory));
+            Assert.False(File.Exists(outputPathAsDirectory));
         }
 
-        private static void CreateValidConfiguration(string rootDirectory, int lookbackMonths)
+        [Fact]
+        public void SignalsJson_IsWrittenAsUtf8WithoutBom()
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
+            using var workspace = new TemporaryWorkspace();
 
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
+
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
+
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+
+            string outputPath = workspace.GetPath("dist", "gem", "signals.json");
+            Assert.True(File.Exists(outputPath));
+
+            byte[] bytes = File.ReadAllBytes(outputPath);
+
+            bool hasBom = bytes.Length >= 3
+                && bytes[0] == 0xEF
+                && bytes[1] == 0xBB
+                && bytes[2] == 0xBF;
+
+            Assert.False(hasBom, "signals.json should be written as UTF-8 without BOM.");
+        }
+
+        private static void CreateValidConfiguration(TemporaryWorkspace workspace, int lookbackMonths)
+        {
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
   ""usEquityFile"": ""us-equity.csv"",
@@ -87,50 +71,37 @@ namespace Gem.Cli.Tests.EntryPoint.Output
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static string CreateTemporaryDirectory()
+        private static void CreateSampleDataFiles(TemporaryWorkspace workspace)
         {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.02
+                2025,2,0.03
+                2025,3,-0.01
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                2025,2,0.02
+                2025,3,0.00
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(
-                fullPath,
-                content.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                2025,2,0.002
+                2025,3,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
         }
     }
 }

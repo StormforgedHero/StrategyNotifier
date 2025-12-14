@@ -54,7 +54,7 @@ namespace Gem.Cli.Tests.Configuration
         {
             using var context = GemConfigLoaderTestContext.Create();
 
-            context.WriteConfig("   " + Environment.NewLine);
+            context.WriteConfig("   \n");
 
             InvalidOperationException ex =
                 Assert.Throws<InvalidOperationException>(() => context.Load());
@@ -144,40 +144,5 @@ namespace Gem.Cli.Tests.Configuration
             Assert.Contains("dataDirectory", ex.Message, StringComparison.Ordinal);
         }
 
-        private sealed class GemConfigLoaderTestContext : IDisposable
-        {
-            public string RootDirectory { get; }
-            public string ConfigDirectory { get; }
-            public string ConfigPath { get; }
-
-            private GemConfigLoaderTestContext(string rootDirectory)
-            {
-                RootDirectory = rootDirectory;
-                ConfigDirectory = Path.Combine(rootDirectory, "config", "gem");
-                ConfigPath = Path.Combine(ConfigDirectory, "gem.cli.json");
-            }
-
-            public static GemConfigLoaderTestContext Create()
-            {
-                string rootDirectory = TestFileSystem.CreateTemporaryDirectory();
-                return new GemConfigLoaderTestContext(rootDirectory);
-            }
-
-            public void WriteConfig(string jsonContent)
-            {
-                TestFileSystem.WriteTextFile(ConfigDirectory, "gem.cli.json", jsonContent);
-            }
-
-            public GemCliConfiguration Load()
-            {
-                var loader = new GemConfigLoader(ConfigPath);
-                return loader.Load();
-            }
-
-            public void Dispose()
-            {
-                TestFileSystem.DeleteDirectoryIfExists(RootDirectory);
-            }
-        }
     }
 }

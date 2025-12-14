@@ -39,13 +39,12 @@ namespace Gem.Cli.Tests.IO
 
             context.WriteDefaultSampleCsvs();
 
-            TestFileSystem.WriteCsv(
-                context.DirectoryPath,
-                "us-equity.csv",
+            context.Workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,not-a-number
-                """);
+                """,
+                "us-equity.csv");
 
             Assert.Throws<FormatException>(() => context.Load());
         }
@@ -518,16 +517,17 @@ namespace Gem.Cli.Tests.IO
 
         private sealed class CsvInputLoaderTestContext : IDisposable
         {
-            public string DirectoryPath { get; }
+            public TemporaryWorkspace Workspace { get; }
+            public string DirectoryPath => Workspace.Root;
 
-            private CsvInputLoaderTestContext(string directoryPath)
+            private CsvInputLoaderTestContext(TemporaryWorkspace workspace)
             {
-                DirectoryPath = directoryPath;
+                Workspace = workspace;
             }
 
             public static CsvInputLoaderTestContext Create()
             {
-                return new CsvInputLoaderTestContext(TestFileSystem.CreateTemporaryDirectory());
+                return new CsvInputLoaderTestContext(new TemporaryWorkspace());
             }
 
             public GemInputData Load()
@@ -543,21 +543,21 @@ namespace Gem.Cli.Tests.IO
 
             public void WriteCsvs(string usEquityCsv, string exUsEquityCsv, string safeAssetCsv)
             {
-                TestFileSystem.WriteCsv(DirectoryPath, "us-equity.csv", usEquityCsv);
-                TestFileSystem.WriteCsv(DirectoryPath, "exus-equity.csv", exUsEquityCsv);
-                TestFileSystem.WriteCsv(DirectoryPath, "safe-asset.csv", safeAssetCsv);
+                Workspace.WriteCsv(usEquityCsv, "us-equity.csv");
+                Workspace.WriteCsv(exUsEquityCsv, "exus-equity.csv");
+                Workspace.WriteCsv(safeAssetCsv, "safe-asset.csv");
             }
 
             public void WriteHeaderOnlyCsvs()
             {
-                TestFileSystem.WriteCsv(DirectoryPath, "us-equity.csv", "Year,Month,Return");
-                TestFileSystem.WriteCsv(DirectoryPath, "exus-equity.csv", "Year,Month,Return");
-                TestFileSystem.WriteCsv(DirectoryPath, "safe-asset.csv", "Year,Month,Return");
+                Workspace.WriteCsv("Year,Month,Return", "us-equity.csv");
+                Workspace.WriteCsv("Year,Month,Return", "exus-equity.csv");
+                Workspace.WriteCsv("Year,Month,Return", "safe-asset.csv");
             }
 
             public void DeleteSafeAssetCsv()
             {
-                string safePath = Path.Combine(DirectoryPath, "safe-asset.csv");
+                string safePath = Workspace.GetPath("safe-asset.csv");
                 if (File.Exists(safePath))
                 {
                     File.Delete(safePath);
@@ -566,7 +566,7 @@ namespace Gem.Cli.Tests.IO
 
             public void Dispose()
             {
-                TestFileSystem.DeleteDirectoryIfExists(DirectoryPath);
+                Workspace.Dispose();
             }
         }
     }

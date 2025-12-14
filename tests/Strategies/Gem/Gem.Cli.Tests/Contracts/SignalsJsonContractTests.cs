@@ -1,5 +1,5 @@
-﻿using Gem.Cli.Contracts;
-using System.Text;
+using Gem.Cli.Contracts;
+using Gem.Cli.Tests.TestSupport;
 using System.Text.Json;
 
 namespace Gem.Cli.Tests.Contracts
@@ -17,129 +17,108 @@ namespace Gem.Cli.Tests.Contracts
         [Fact]
         public void Run_WritesSignalsJson_WithValidPeriodFormatAndAllowedPositions()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
+            CreateConfigurationFile(workspace, lookbackMonths: 2);
+            CreateSampleCsvData(workspace);
+
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
+
+            int exitCode = Program.Run(workspace.Root, outWriter, errWriter);
+
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+
+            GemSignalOutput[] signals = ReadSignals(workspace);
+            Assert.NotEmpty(signals);
+
+            foreach (GemSignalOutput signal in signals)
             {
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 2);
-                CreateSampleCsvData(rootDirectory);
-
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
-
-                int exitCode = Program.Run(rootDirectory, outWriter, errWriter);
-
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
-
-                GemSignalOutput[] signals = ReadSignals(rootDirectory);
-                Assert.NotEmpty(signals);
-
-                foreach (GemSignalOutput signal in signals)
-                {
-                    Assert.True(IsValidYearMonth(signal.Period), $"Invalid period: '{signal.Period}'.");
-                    Assert.True(AllowedPositions.Contains(signal.Position), $"Invalid position: '{signal.Position}'.");
-                }
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
+                Assert.True(IsValidYearMonth(signal.Period), $"Invalid period: '{signal.Period}'.");
+                Assert.True(AllowedPositions.Contains(signal.Position), $"Invalid position: '{signal.Position}'.");
             }
         }
 
         [Fact]
         public void Run_WritesSignalsJson_SortedByPeriodAscending_AndNoDuplicatePeriods()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
+            CreateConfigurationFile(workspace, lookbackMonths: 2);
+            CreateSampleCsvData(workspace);
+
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
+
+            int exitCode = Program.Run(workspace.Root, outWriter, errWriter);
+
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+
+            GemSignalOutput[] signals = ReadSignals(workspace);
+            Assert.NotEmpty(signals);
+
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+
+            int? previousIndex = null;
+
+            foreach (GemSignalOutput signal in signals)
             {
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 2);
-                CreateSampleCsvData(rootDirectory);
+                Assert.True(seen.Add(signal.Period), $"Duplicate period detected: '{signal.Period}'.");
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+                Assert.True(
+                    TryParseYearMonth(signal.Period, out int year, out int month),
+                    $"Invalid period: '{signal.Period}'.");
 
-                int exitCode = Program.Run(rootDirectory, outWriter, errWriter);
+                int currentIndex = (year * 12) + month;
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
-
-                GemSignalOutput[] signals = ReadSignals(rootDirectory);
-                Assert.NotEmpty(signals);
-
-                var seen = new HashSet<string>(StringComparer.Ordinal);
-
-                int? previousIndex = null;
-
-                foreach (GemSignalOutput signal in signals)
+                if (previousIndex.HasValue)
                 {
-                    Assert.True(seen.Add(signal.Period), $"Duplicate period detected: '{signal.Period}'.");
-
                     Assert.True(
-                        TryParseYearMonth(signal.Period, out int year, out int month),
-                        $"Invalid period: '{signal.Period}'.");
-
-                    int currentIndex = (year * 12) + month;
-
-                    if (previousIndex.HasValue)
-                    {
-                        Assert.True(
-                            currentIndex > previousIndex.Value,
-                            "Signals are not strictly increasing by period.");
-                    }
-
-                    previousIndex = currentIndex;
+                        currentIndex > previousIndex.Value,
+                        "Signals are not strictly increasing by period.");
                 }
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
+
+                previousIndex = currentIndex;
             }
         }
 
         [Fact]
         public void Run_WhenNoSignalsAreGenerated_StillWritesValidEmptyJsonArray()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                // Lookback larger than available history -> zero signals expected.
-                CreateConfigurationFile(rootDirectory, lookbackMonths: 12);
-                CreateSampleCsvData(rootDirectory);
+            // Lookback larger than available history -> zero signals expected.
+            CreateConfigurationFile(workspace, lookbackMonths: 12);
+            CreateSampleCsvData(workspace);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(0, exitCode);
-                Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
+            Assert.Equal(0, exitCode);
+            Assert.True(string.IsNullOrWhiteSpace(errWriter.ToString()));
 
-                string outputPath = GetSignalsPath(rootDirectory);
-                Assert.True(File.Exists(outputPath));
-
-                string json = File.ReadAllText(outputPath, Encoding.UTF8);
-
-                GemSignalOutput[]? signals =
-                    JsonSerializer.Deserialize<GemSignalOutput[]>(json);
-
-                Assert.NotNull(signals);
-                Assert.Empty(signals!);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
-        }
-
-        private static GemSignalOutput[] ReadSignals(string rootDirectory)
-        {
-            string outputPath = GetSignalsPath(rootDirectory);
+            string outputPath = GetSignalsPath(workspace);
             Assert.True(File.Exists(outputPath));
 
-            string json = File.ReadAllText(outputPath, Encoding.UTF8);
+            string json = File.ReadAllText(outputPath, Utf8TestEncoding.Utf8NoBom);
+
+            GemSignalOutput[]? signals =
+                JsonSerializer.Deserialize<GemSignalOutput[]>(json);
+
+            Assert.NotNull(signals);
+            Assert.Empty(signals!);
+        }
+
+        private static GemSignalOutput[] ReadSignals(TemporaryWorkspace workspace)
+        {
+            string outputPath = GetSignalsPath(workspace);
+            Assert.True(File.Exists(outputPath));
+
+            string json = File.ReadAllText(outputPath, Utf8TestEncoding.Utf8NoBom);
 
             GemSignalOutput[]? signals =
                 JsonSerializer.Deserialize<GemSignalOutput[]>(json);
@@ -149,9 +128,9 @@ namespace Gem.Cli.Tests.Contracts
             return signals!;
         }
 
-        private static string GetSignalsPath(string rootDirectory)
+        private static string GetSignalsPath(TemporaryWorkspace workspace)
         {
-            return Path.Combine(rootDirectory, "dist", "gem", "signals.json");
+            return workspace.GetPath("dist", "gem", "signals.json");
         }
 
         private static bool IsValidYearMonth(string value)
@@ -198,14 +177,8 @@ namespace Gem.Cli.Tests.Contracts
             return true;
         }
 
-        private static void CreateConfigurationFile(string rootDirectory, int lookbackMonths)
+        private static void CreateConfigurationFile(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
-            // Intentionally relative paths (verified by earlier ProgramRunTests).
             string jsonConfig =
                 "{\n" +
                 "  \"dataDirectory\": \"data/gem/sample\",\n" +
@@ -216,83 +189,37 @@ namespace Gem.Cli.Tests.Contracts
                 $"  \"lookbackMonths\": {lookbackMonths}\n" +
                 "}\n";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static void CreateSampleCsvData(string rootDirectory)
+        private static void CreateSampleCsvData(TemporaryWorkspace workspace)
         {
-            string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-            Directory.CreateDirectory(dataDirectory);
-
-            WriteCsv(
-                dataDirectory,
-                "us-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.02
                 2025,2,0.03
                 2025,3,-0.01
-                """);
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "exus-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.01
                 2025,2,0.02
                 2025,3,0.00
-                """);
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "safe-asset.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.002
                 2025,2,0.002
                 2025,3,0.002
-                """);
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(fullPath, content.Trim() + Environment.NewLine, Encoding.UTF8);
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
         }
     }
 }

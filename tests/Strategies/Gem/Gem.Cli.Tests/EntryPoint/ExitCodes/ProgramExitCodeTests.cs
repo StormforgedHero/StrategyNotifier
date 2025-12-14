@@ -1,4 +1,4 @@
-﻿using System.Text;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.EntryPoint.ExitCodes
 {
@@ -7,213 +7,153 @@ namespace Gem.Cli.Tests.EntryPoint.ExitCodes
         [Fact]
         public void Run_WhenConfigurationFileIsMissing_ReturnsConfigurationFileNotFoundExitCode()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(Cli.Program.ExitCodeConfigurationFileNotFound, exitCode);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(Cli.Program.ExitCodeConfigurationFileNotFound, exitCode);
         }
 
         [Fact]
         public void Run_WhenConfigurationJsonIsInvalid_ReturnsConfigurationErrorExitCode()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                WriteConfigurationFile(
-                    rootDirectory,
-                    """
-                    {
-                      "dataDirectory": "data/gem/sample"
-                    """); // Missing closing brace -> invalid JSON.
+            WriteConfigurationFile(
+                workspace,
+                """
+                {
+                  "dataDirectory": "data/gem/sample"
+                """); // Missing closing brace -> invalid JSON.
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(Cli.Program.ExitCodeConfigurationError, exitCode);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(Cli.Program.ExitCodeConfigurationError, exitCode);
         }
 
         [Fact]
         public void Run_WhenInputDataFileIsMissing_ReturnsInputDataFileNotFoundExitCode()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.02
+                2025,2,0.03
+                2025,3,-0.01
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Missing safe-asset.csv on purpose.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.02
-                    2025,2,0.03
-                    2025,3,-0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                2025,2,0.02
+                2025,3,0.00
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    2025,2,0.02
-                    2025,3,0.00
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
-
-                Assert.Equal(Cli.Program.ExitCodeInputDataFileNotFound, exitCode);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(Cli.Program.ExitCodeInputDataFileNotFound, exitCode);
         }
 
         [Fact]
         public void Run_WhenInputDataHasInvalidNumber_ReturnsInputDataFormatErrorExitCode()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,not-a-number
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Invalid return in US equity file.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,not-a-number
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                2025,2,0.02
+                2025,3,0.00
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    2025,2,0.02
-                    2025,3,0.00
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                2025,2,0.002
+                2025,3,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    2025,2,0.002
-                    2025,3,0.002
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
-
-                Assert.Equal(Cli.Program.ExitCodeInputDataFormatError, exitCode);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(Cli.Program.ExitCodeInputDataFormatError, exitCode);
         }
 
         [Fact]
         public void Run_WhenInputDataContainsDuplicatePeriods_ReturnsInputDataValidationErrorExitCode()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
 
-                string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-                Directory.CreateDirectory(dataDirectory);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.02
+                2025,1,0.03
+                2025,2,0.01
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-                // Duplicate period in US equity file: 2025-01 twice.
-                WriteCsv(
-                    dataDirectory,
-                    "us-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.02
-                    2025,1,0.03
-                    2025,2,0.01
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.01
+                2025,2,0.02
+                2025,3,0.00
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "exus-equity.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.01
-                    2025,2,0.02
-                    2025,3,0.00
-                    """);
+            workspace.WriteCsv(
+                """
+                Year,Month,Return
+                2025,1,0.002
+                2025,2,0.002
+                2025,3,0.002
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
 
-                WriteCsv(
-                    dataDirectory,
-                    "safe-asset.csv",
-                    """
-                    Year,Month,Return
-                    2025,1,0.002
-                    2025,2,0.002
-                    2025,3,0.002
-                    """);
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
-
-                Assert.Equal(Cli.Program.ExitCodeInputDataValidationError, exitCode);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            Assert.Equal(Cli.Program.ExitCodeInputDataValidationError, exitCode);
         }
 
-        private static void CreateValidConfiguration(string rootDirectory, int lookbackMonths)
+        private static void CreateValidConfiguration(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
   ""usEquityFile"": ""us-equity.csv"",
@@ -223,63 +163,12 @@ namespace Gem.Cli.Tests.EntryPoint.ExitCodes
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static void WriteConfigurationFile(string rootDirectory, string jsonConfig)
+        private static void WriteConfigurationFile(TemporaryWorkspace workspace, string jsonConfig)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
-            File.WriteAllText(
-                configPath,
-                jsonConfig.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(
-                fullPath,
-                content.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
     }
 }

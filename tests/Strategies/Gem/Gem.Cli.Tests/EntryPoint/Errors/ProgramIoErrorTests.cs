@@ -1,4 +1,4 @@
-﻿using System.Text;
+using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests.EntryPoint.Errors
 {
@@ -7,92 +7,73 @@ namespace Gem.Cli.Tests.EntryPoint.Errors
         [Fact]
         public void Run_WhenInputFileIsLocked_ReturnsNonZeroAndWritesIoError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                string lockedInputPath = Path.Combine(rootDirectory, "data", "gem", "sample", "us-equity.csv");
+            string lockedInputPath = workspace.GetPath("data", "gem", "sample", "us-equity.csv");
 
-                using var lockStream = new FileStream(
-                    lockedInputPath,
-                    FileMode.Open,
-                    FileAccess.ReadWrite,
-                    FileShare.None);
+            using var lockStream = new FileStream(
+                lockedInputPath,
+                FileMode.Open,
+                FileAccess.ReadWrite,
+                FileShare.None);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(Cli.Program.ExitCodeIoError, exitCode);
+            Assert.Equal(Cli.Program.ExitCodeIoError, exitCode);
 
-                string error = errWriter.ToString();
-                Assert.Contains("I/O error", error, StringComparison.Ordinal);
-                Assert.Contains("us-equity.csv", error, StringComparison.OrdinalIgnoreCase);
-                Assert.DoesNotContain("Output write error", error, StringComparison.Ordinal);
+            string error = errWriter.ToString();
+            Assert.Contains("I/O error", error, StringComparison.Ordinal);
+            Assert.Contains("us-equity.csv", error, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("Output write error", error, StringComparison.Ordinal);
 
-                string outputPath = Path.Combine(rootDirectory, "dist", "gem", "signals.json");
-                Assert.False(File.Exists(outputPath));
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string outputPath = workspace.GetPath("dist", "gem", "signals.json");
+            Assert.False(File.Exists(outputPath));
         }
 
         [Fact]
         public void Run_WhenOutputSignalsFileIsLocked_ReturnsNonZeroAndWritesOutputWriteError()
         {
-            string rootDirectory = CreateTemporaryDirectory();
+            using var workspace = new TemporaryWorkspace();
 
-            try
-            {
-                CreateValidConfiguration(rootDirectory, lookbackMonths: 2);
-                CreateSampleDataFiles(rootDirectory);
+            CreateValidConfiguration(workspace, lookbackMonths: 2);
+            CreateSampleDataFiles(workspace);
 
-                string outputDirectory = Path.Combine(rootDirectory, "dist", "gem");
-                Directory.CreateDirectory(outputDirectory);
+            string outputDirectory = workspace.GetPath("dist", "gem");
+            Directory.CreateDirectory(outputDirectory);
 
-                string outputPath = Path.Combine(outputDirectory, "signals.json");
+            string outputPath = Path.Combine(outputDirectory, "signals.json");
 
-                File.WriteAllText(
-                    outputPath,
-                    "[]\n",
-                    new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            File.WriteAllText(
+                outputPath,
+                "[]\n",
+                Utf8TestEncoding.Utf8NoBom);
 
-                using var lockStream = new FileStream(
-                    outputPath,
-                    FileMode.Open,
-                    FileAccess.ReadWrite,
-                    FileShare.None);
+            using var lockStream = new FileStream(
+                outputPath,
+                FileMode.Open,
+                FileAccess.ReadWrite,
+                FileShare.None);
 
-                using var outWriter = new StringWriter();
-                using var errWriter = new StringWriter();
+            using var outWriter = new StringWriter();
+            using var errWriter = new StringWriter();
 
-                int exitCode = Cli.Program.Run(rootDirectory, outWriter, errWriter);
+            int exitCode = Cli.Program.Run(workspace.Root, outWriter, errWriter);
 
-                Assert.Equal(Cli.Program.ExitCodeOutputWriteError, exitCode);
+            Assert.Equal(Cli.Program.ExitCodeOutputWriteError, exitCode);
 
-                string error = errWriter.ToString();
-                Assert.Contains("Output write error", error, StringComparison.Ordinal);
-                Assert.Contains("signals.json", error, StringComparison.OrdinalIgnoreCase);
-            }
-            finally
-            {
-                DeleteDirectoryIfExists(rootDirectory);
-            }
+            string error = errWriter.ToString();
+            Assert.Contains("Output write error", error, StringComparison.Ordinal);
+            Assert.Contains("signals.json", error, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static void CreateValidConfiguration(string rootDirectory, int lookbackMonths)
+        private static void CreateValidConfiguration(TemporaryWorkspace workspace, int lookbackMonths)
         {
-            string configDirectory = Path.Combine(rootDirectory, "config", "gem");
-            Directory.CreateDirectory(configDirectory);
-
-            string configPath = Path.Combine(configDirectory, "gem.cli.json");
-
             string jsonConfig = $@"{{
   ""dataDirectory"": ""data/gem/sample"",
   ""usEquityFile"": ""us-equity.csv"",
@@ -102,86 +83,37 @@ namespace Gem.Cli.Tests.EntryPoint.Errors
   ""lookbackMonths"": {lookbackMonths}
 }}";
 
-            File.WriteAllText(
-                configPath,
-                jsonConfig,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            workspace.WriteText(jsonConfig, "config", "gem", "gem.cli.json");
         }
 
-        private static void CreateSampleDataFiles(string rootDirectory)
+        private static void CreateSampleDataFiles(TemporaryWorkspace workspace)
         {
-            string dataDirectory = Path.Combine(rootDirectory, "data", "gem", "sample");
-            Directory.CreateDirectory(dataDirectory);
-
-            WriteCsv(
-                dataDirectory,
-                "us-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.02
                 2025,2,0.03
                 2025,3,-0.01
-                """);
+                """,
+                "data", "gem", "sample", "us-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "exus-equity.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.01
                 2025,2,0.02
                 2025,3,0.00
-                """);
+                """,
+                "data", "gem", "sample", "exus-equity.csv");
 
-            WriteCsv(
-                dataDirectory,
-                "safe-asset.csv",
+            workspace.WriteCsv(
                 """
                 Year,Month,Return
                 2025,1,0.002
                 2025,2,0.002
                 2025,3,0.002
-                """);
-        }
-
-        private static void WriteCsv(string directory, string fileName, string content)
-        {
-            Directory.CreateDirectory(directory);
-
-            string fullPath = Path.Combine(directory, fileName);
-            File.WriteAllText(
-                fullPath,
-                content.Trim() + Environment.NewLine,
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        }
-
-        private static string CreateTemporaryDirectory()
-        {
-            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        private static void DeleteDirectoryIfExists(string directory)
-        {
-            if (string.IsNullOrWhiteSpace(directory))
-            {
-                return;
-            }
-
-            if (!Directory.Exists(directory))
-            {
-                return;
-            }
-
-            try
-            {
-                Directory.Delete(directory, recursive: true);
-            }
-            catch
-            {
-                // Ignore cleanup failures in tests.
-            }
+                """,
+                "data", "gem", "sample", "safe-asset.csv");
         }
     }
 }
