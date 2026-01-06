@@ -1,0 +1,14 @@
+{
+  "windowMonths": 2,
+  "rankingMode": "Top1",
+  "instruments": {
+    "riskOn": [
+      { "ticker": "ETFBW20TR.PL", "name": "W20", "sourceSymbol": "etfbw20tr.pl" },
+      { "ticker": "ETFBM40TR.PL", "name": "M40", "sourceSymbol": "etfbm40tr.pl" }
+    ],
+    "safeAsset": { "ticker": "ETFBNDXPL.PL", "name": "BNDX", "sourceSymbol": "etfbndxpl.pl" }
+  },
+  "dataDirectory": "data",
+  "outputPath": "dist/gem/signals.json",
+  "update": { "enabledByDefault": false }
+}

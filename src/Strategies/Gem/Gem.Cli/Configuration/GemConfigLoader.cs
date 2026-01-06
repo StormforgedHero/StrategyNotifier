@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Linq;
 using Gem.Domain.Model;
 
 namespace Gem.Cli.Configuration
@@ -65,24 +67,23 @@ namespace Gem.Cli.Configuration
                 throw new InvalidOperationException("Instruments configuration is required.");
             }
 
-            if (config.Instruments.UsEquity is null
-                || config.Instruments.ExUsEquity is null
-                || config.Instruments.SafeAsset is null)
+            IReadOnlyList<Instrument> riskOnInstruments = BuildRiskOnInstruments(config.Instruments);
+
+            if (config.Instruments.SafeAsset is null)
             {
-                throw new InvalidOperationException("All instruments (usEquity, exUsEquity, safeAsset) must be provided.");
+                throw new InvalidOperationException("Safe asset configuration is required.");
             }
 
             int window = config.WindowMonths ?? 12;
             RankingMode ranking = ParseRanking(config.RankingMode);
             var momentum = new MomentumParameters(window, ranking, useAbsoluteMomentum: true, absoluteThreshold: 0m);
 
-            Instrument us = BuildInstrument(config.Instruments.UsEquity, "US Equity");
-            Instrument exUs = BuildInstrument(config.Instruments.ExUsEquity, "Ex-US Equity");
             Instrument safe = BuildInstrument(config.Instruments.SafeAsset, "Safe Asset");
 
-            ValidateUniqueSymbols(new[] { us, exUs, safe });
+            ValidateRiskOnCount(riskOnInstruments, ranking);
+            ValidateUniqueSymbols(riskOnInstruments.Concat(new[] { safe }));
 
-            var portfolio = new PortfolioConfiguration(new[] { us, exUs }, safe, momentum);
+            var portfolio = new PortfolioConfiguration(riskOnInstruments, safe, momentum);
 
             UpdateSettings update = BuildUpdateSettings(config.Update);
 
@@ -127,8 +128,49 @@ namespace Gem.Cli.Configuration
             return settings;
         }
 
+        private static IReadOnlyList<Instrument> BuildRiskOnInstruments(InstrumentsConfig instruments)
+        {
+            if (instruments.RiskOn is { Count: > 0 })
+            {
+                if (instruments.RiskOn.Any(item => item is null))
+                {
+                    throw new InvalidOperationException("Instruments.riskOn cannot contain null entries.");
+                }
+
+                return instruments.RiskOn
+                    .Select((config, index) => BuildInstrument(config, $"Risk-On {index + 1}"))
+                    .ToList();
+            }
+
+            if (instruments.UsEquity is null || instruments.ExUsEquity is null)
+            {
+                throw new InvalidOperationException("Risk-on instruments must be provided via 'riskOn' or both 'usEquity' and 'exUsEquity'.");
+            }
+
+            return new[]
+            {
+                BuildInstrument(instruments.UsEquity, "US Equity"),
+                BuildInstrument(instruments.ExUsEquity, "Ex-US Equity")
+            };
+        }
+
+        private static void ValidateRiskOnCount(IReadOnlyList<Instrument> riskOnInstruments, RankingMode ranking)
+        {
+            if (riskOnInstruments.Count == 0)
+            {
+                throw new InvalidOperationException("At least one risk-on instrument must be provided.");
+            }
+
+            if (ranking == RankingMode.Top2 && riskOnInstruments.Count < 2)
+            {
+                throw new InvalidOperationException("RankingMode=Top2 requires at least two risk-on instruments.");
+            }
+        }
+
         private static Instrument BuildInstrument(InstrumentConfig config, string fallbackName)
         {
+            ArgumentNullException.ThrowIfNull(config);
+
             if (string.IsNullOrWhiteSpace(config.Ticker))
             {
                 throw new InvalidOperationException("Instrument ticker is required.");

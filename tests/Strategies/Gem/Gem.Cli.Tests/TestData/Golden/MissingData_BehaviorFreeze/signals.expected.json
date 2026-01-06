@@ -1,0 +1,17 @@
+[
+  {
+    "date": "2024-03-31",
+    "windowMonths": 1,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "GAP1.US",
+        "name": "Gap One",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "GAP1.US return 20.00 % =\u003E risk-on"
+  }
+]

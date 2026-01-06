@@ -1,0 +1,22 @@
+[
+  {
+    "date": "2024-02-29",
+    "windowMonths": 1,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "AAA.TEST",
+        "name": "Risk A",
+        "weight": 0.5
+      },
+      {
+        "ticker": "BBB.TEST",
+        "name": "Risk B",
+        "weight": 0.5
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "AAA.TEST return 20.00 % =\u003E risk-on"
+  }
+]

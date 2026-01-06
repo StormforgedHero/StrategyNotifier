@@ -1,0 +1,47 @@
+[
+  {
+    "date": "2024-03-29",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.5,
+    "relativeRank": 1,
+    "comment": "VOO.US return 50.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-04-30",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.28,
+    "relativeRank": 1,
+    "comment": "VOO.US return 28.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-05-31",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "VOO.US return 20.00 % =\u003E risk-on"
+  }
+]

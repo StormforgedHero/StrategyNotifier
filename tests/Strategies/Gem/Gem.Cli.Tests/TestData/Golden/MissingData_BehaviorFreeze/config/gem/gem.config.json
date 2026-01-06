@@ -1,0 +1,14 @@
+{
+  "windowMonths": 1,
+  "rankingMode": "Top1",
+  "instruments": {
+    "riskOn": [
+      { "ticker": "GAP1.US", "name": "Gap One", "sourceSymbol": "gap1.us" },
+      { "ticker": "GAP2.US", "name": "Gap Two", "sourceSymbol": "gap2.us" }
+    ],
+    "safeAsset": { "ticker": "SAFEGAP.US", "name": "Safe Gap", "sourceSymbol": "safegap.us" }
+  },
+  "dataDirectory": "data",
+  "outputPath": "dist/gem/signals.json",
+  "update": { "enabledByDefault": false }
+}

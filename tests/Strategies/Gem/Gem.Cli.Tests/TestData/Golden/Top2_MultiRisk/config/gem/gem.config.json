@@ -1,0 +1,15 @@
+{
+  "windowMonths": 1,
+  "rankingMode": "Top2",
+  "instruments": {
+    "riskOn": [
+      { "ticker": "AAA.TEST", "name": "Risk A", "sourceSymbol": "aaa.test" },
+      { "ticker": "BBB.TEST", "name": "Risk B", "sourceSymbol": "bbb.test" },
+      { "ticker": "CCC.TEST", "name": "Risk C", "sourceSymbol": "ccc.test" }
+    ],
+    "safeAsset": { "ticker": "SAFE.TEST", "name": "Safe", "sourceSymbol": "safe.test" }
+  },
+  "dataDirectory": "data",
+  "outputPath": "dist/gem/signals.json",
+  "update": { "enabledByDefault": false }
+}

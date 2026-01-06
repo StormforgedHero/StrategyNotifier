@@ -1,0 +1,14 @@
+{
+  "windowMonths": 2,
+  "rankingMode": "Top1",
+  "instruments": {
+    "riskOn": [
+      { "ticker": "SPPW.DE", "name": "SPPW", "sourceSymbol": "sppw.de" },
+      { "ticker": "IS3N.DE", "name": "IS3N", "sourceSymbol": "is3n.de" }
+    ],
+    "safeAsset": { "ticker": "EUNA.DE", "name": "EUNA", "sourceSymbol": "euna.de" }
+  },
+  "dataDirectory": "data",
+  "outputPath": "dist/gem/signals.json",
+  "update": { "enabledByDefault": false }
+}

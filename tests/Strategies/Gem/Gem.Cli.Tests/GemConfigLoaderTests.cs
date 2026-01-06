@@ -59,6 +59,92 @@ public sealed class GemConfigLoaderTests
         Assert.Throws<FileNotFoundException>(() => loader.Load());
     }
 
+    [Fact]
+    public void Load_WithRiskOnCollection_UsesAllEntries()
+    {
+        using var workspace = new TemporaryWorkspace();
+        string configPath = CreateConfigFile(workspace, """
+        {
+          "windowMonths": 4,
+          "rankingMode": "Top2",
+          "instruments": {
+            "riskOn": [
+              { "ticker": "AAA.DE", "sourceSymbol": "aaa.de" },
+              { "ticker": "BBB.DE", "sourceSymbol": "bbb.de" },
+              { "ticker": "CCC.DE", "sourceSymbol": "ccc.de" }
+            ],
+            "safeAsset": { "ticker": "SAFE.DE", "sourceSymbol": "safe.de" }
+          }
+        }
+        """);
+
+        var loader = new GemConfigLoader(configPath);
+        GemCliConfiguration configuration = loader.Load();
+
+        Assert.Equal(3, configuration.Portfolio.RiskOnInstruments.Count);
+        Assert.All(configuration.Portfolio.RiskOnInstruments, instrument => Assert.False(string.IsNullOrWhiteSpace(instrument.SourceSymbol)));
+        Assert.Equal("SAFE.DE", configuration.Portfolio.RiskOffInstrument.Ticker);
+        Assert.Equal(RankingMode.Top2, configuration.Portfolio.Momentum.RankingMode);
+    }
+
+    [Fact]
+    public void Load_Top2WithSingleRiskOn_Throws()
+    {
+        using var workspace = new TemporaryWorkspace();
+        string configPath = CreateConfigFile(workspace, """
+        {
+          "windowMonths": 3,
+          "rankingMode": "Top2",
+          "instruments": {
+            "riskOn": [ { "ticker": "AAA.US" } ],
+            "safeAsset": { "ticker": "SAFE.US" }
+          }
+        }
+        """);
+
+        var loader = new GemConfigLoader(configPath);
+        var ex = Assert.Throws<InvalidOperationException>(() => loader.Load());
+        Assert.Contains("RankingMode=Top2", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Load_DuplicateTicker_Throws()
+    {
+        using var workspace = new TemporaryWorkspace();
+        string configPath = CreateConfigFile(workspace, """
+        {
+          "windowMonths": 3,
+          "instruments": {
+            "riskOn": [ { "ticker": "AAA.US" }, { "ticker": "AAA.US" } ],
+            "safeAsset": { "ticker": "SAFE.US" }
+          }
+        }
+        """);
+
+        var loader = new GemConfigLoader(configPath);
+        var ex = Assert.Throws<InvalidOperationException>(() => loader.Load());
+        Assert.Contains("Duplicate instrument identifier", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Load_RiskOnNullEntry_Throws()
+    {
+        using var workspace = new TemporaryWorkspace();
+        string configPath = CreateConfigFile(workspace, """
+        {
+          "windowMonths": 3,
+          "instruments": {
+            "riskOn": [ null, { "ticker": "AAA.US" } ],
+            "safeAsset": { "ticker": "SAFE.US" }
+          }
+        }
+        """);
+
+        var loader = new GemConfigLoader(configPath);
+        var ex = Assert.Throws<InvalidOperationException>(() => loader.Load());
+        Assert.Contains("riskOn cannot contain null", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static string CreateConfigFile(TemporaryWorkspace workspace, string json)
     {
         string path = workspace.GetPath("config", "gem", "gem.config.json");
