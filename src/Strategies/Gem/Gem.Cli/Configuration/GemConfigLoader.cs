@@ -1,13 +1,16 @@
-using System.Collections.Generic;
+using Gem.Domain.Model;
 using System.Text;
 using System.Text.Json;
-using System.Linq;
-using Gem.Domain.Model;
 
 namespace Gem.Cli.Configuration
 {
     public sealed class GemConfigLoader
     {
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         private readonly string _path;
 
         public GemConfigLoader(string path)
@@ -36,28 +39,24 @@ namespace Gem.Cli.Configuration
                 throw new InvalidOperationException("Configuration file is empty.");
             }
 
-            GemConfigFile? config;
-
             try
             {
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
+                using JsonDocument document = JsonDocument.Parse(json);
+                ValidateKnownFields(document.RootElement);
 
-                config = JsonSerializer.Deserialize<GemConfigFile>(json, options);
+                GemConfigFile? config = JsonSerializer.Deserialize<GemConfigFile>(json, JsonOptions);
+
+                if (config is null)
+                {
+                    throw new InvalidOperationException("Configuration file is empty.");
+                }
+
+                return BuildConfiguration(config);
             }
             catch (JsonException ex)
             {
                 throw new InvalidOperationException("Configuration file contains invalid JSON.", ex);
             }
-
-            if (config is null)
-            {
-                throw new InvalidOperationException("Configuration file is empty.");
-            }
-
-            return BuildConfiguration(config);
         }
 
         private static GemCliConfiguration BuildConfiguration(GemConfigFile config)
@@ -78,7 +77,7 @@ namespace Gem.Cli.Configuration
             RankingMode ranking = ParseRanking(config.RankingMode);
             var momentum = new MomentumParameters(window, ranking, useAbsoluteMomentum: true, absoluteThreshold: 0m);
 
-            Instrument safe = BuildInstrument(config.Instruments.SafeAsset, "Safe Asset");
+            Instrument safe = BuildInstrument(config.Instruments.SafeAsset);
 
             ValidateRiskOnCount(riskOnInstruments, ranking);
             ValidateUniqueSymbols(riskOnInstruments.Concat(new[] { safe }));
@@ -87,18 +86,30 @@ namespace Gem.Cli.Configuration
 
             UpdateSettings update = BuildUpdateSettings(config.Update);
 
-            string dataDirectory = string.IsNullOrWhiteSpace(config.DataDirectory)
-                ? "data/gem/sample"
-                : config.DataDirectory!;
+            if (string.IsNullOrWhiteSpace(config.StoreDirectory))
+            {
+                throw new InvalidOperationException("storeDirectory is required.");
+            }
 
-            string outputSignalsFile = string.IsNullOrWhiteSpace(config.OutputPath)
-                ? "dist/gem/signals.json"
-                : config.OutputPath!;
+            if (string.IsNullOrWhiteSpace(config.CacheDirectory))
+            {
+                throw new InvalidOperationException("cacheDirectory is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(config.OutputPath))
+            {
+                throw new InvalidOperationException("outputPath is required.");
+            }
+
+            string storeDirectory = config.StoreDirectory!;
+            string cacheDirectory = config.CacheDirectory!;
+            string outputSignalsFile = config.OutputPath!;
 
             return new GemCliConfiguration(
                 portfolio,
                 update,
-                dataDirectory,
+                storeDirectory,
+                cacheDirectory,
                 outputSignalsFile);
         }
 
@@ -115,42 +126,33 @@ namespace Gem.Cli.Configuration
 
         private static UpdateSettings BuildUpdateSettings(UpdateConfig? update)
         {
+            bool autoUpdate = update?.AutoUpdateEnabled ?? false;
+            int? maxAgeDays = update?.MaxAgeDays;
+            int? minMinutesBetweenAttempts = update?.MinMinutesBetweenAttempts;
+
             var settings = new UpdateSettings
             {
-                Enabled = update?.EnabledByDefault ?? true,
-                FreshnessDays = update?.FreshnessDays ?? 2,
-                MinDelaySeconds = update?.MinHoursBetweenUpdates.HasValue == true
-                    ? (int)(update!.MinHoursBetweenUpdates.Value * 3600)
-                    : 1
+                AutoUpdateEnabled = autoUpdate,
+                MaxAgeDays = maxAgeDays ?? 2,
+                MinMinutesBetweenAttempts = minMinutesBetweenAttempts ?? 30,
+                SaveUpdatedDataToStore = update?.SaveUpdatedDataToStore ?? true
             };
 
-            settings.EnsureDefaults();
+            settings.Validate();
             return settings;
         }
 
         private static IReadOnlyList<Instrument> BuildRiskOnInstruments(InstrumentsConfig instruments)
         {
-            if (instruments.RiskOn is { Count: > 0 })
-            {
-                if (instruments.RiskOn.Any(item => item is null))
-                {
-                    throw new InvalidOperationException("Instruments.riskOn cannot contain null entries.");
-                }
-
-                return instruments.RiskOn
-                    .Select((config, index) => BuildInstrument(config, $"Risk-On {index + 1}"))
-                    .ToList();
-            }
-
             if (instruments.UsEquity is null || instruments.ExUsEquity is null)
             {
-                throw new InvalidOperationException("Risk-on instruments must be provided via 'riskOn' or both 'usEquity' and 'exUsEquity'.");
+                throw new InvalidOperationException("Risk-on instruments must include both 'usEquity' and 'exUsEquity'.");
             }
 
             return new[]
             {
-                BuildInstrument(instruments.UsEquity, "US Equity"),
-                BuildInstrument(instruments.ExUsEquity, "Ex-US Equity")
+                BuildInstrument(instruments.UsEquity),
+                BuildInstrument(instruments.ExUsEquity)
             };
         }
 
@@ -167,7 +169,7 @@ namespace Gem.Cli.Configuration
             }
         }
 
-        private static Instrument BuildInstrument(InstrumentConfig config, string fallbackName)
+        private static Instrument BuildInstrument(InstrumentConfig config)
         {
             ArgumentNullException.ThrowIfNull(config);
 
@@ -176,14 +178,19 @@ namespace Gem.Cli.Configuration
                 throw new InvalidOperationException("Instrument ticker is required.");
             }
 
-            if (config.SourceSymbol is not null && string.IsNullOrWhiteSpace(config.SourceSymbol))
+            if (string.IsNullOrWhiteSpace(config.Name))
             {
-                throw new InvalidOperationException("Instrument sourceSymbol cannot be empty when provided.");
+                throw new InvalidOperationException("Instrument name is required.");
+            }
+
+            if (string.IsNullOrWhiteSpace(config.SourceSymbol))
+            {
+                throw new InvalidOperationException("Instrument sourceSymbol is required.");
             }
 
             return new Instrument(
                 config.Ticker,
-                string.IsNullOrWhiteSpace(config.Name) ? fallbackName : config.Name!,
+                config.Name!,
                 config.SourceSymbol);
         }
 
@@ -209,6 +216,117 @@ namespace Gem.Cli.Configuration
                 if (!seen.Add(key))
                 {
                     throw new InvalidOperationException($"Duplicate instrument identifier detected: '{key}'.");
+                }
+            }
+        }
+
+        private static void ValidateKnownFields(JsonElement root)
+        {
+            var topLevel = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "windowMonths",
+                "rankingMode",
+                "instruments",
+                "update",
+                "storeDirectory",
+                "cacheDirectory",
+                "outputPath"
+            };
+
+            foreach (JsonProperty property in root.EnumerateObject())
+            {
+                if (!topLevel.Contains(property.Name))
+                {
+                    throw new InvalidOperationException($"Configuration contains unsupported field '{property.Name}'.");
+                }
+
+                if (string.Equals(property.Name, "instruments", StringComparison.OrdinalIgnoreCase))
+                {
+                    ValidateInstruments(property.Value);
+                }
+                else if (string.Equals(property.Name, "update", StringComparison.OrdinalIgnoreCase))
+                {
+                    ValidateUpdate(property.Value);
+                }
+            }
+        }
+
+        private static void ValidateInstruments(JsonElement instrumentsElement)
+        {
+            if (instrumentsElement.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidOperationException("instruments must be an object.");
+            }
+
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "usEquity",
+                "exUsEquity",
+                "safeAsset"
+            };
+
+            foreach (JsonProperty property in instrumentsElement.EnumerateObject())
+            {
+                if (!allowed.Contains(property.Name))
+                {
+                    throw new InvalidOperationException($"Configuration contains unsupported field 'instruments.{property.Name}'.");
+                }
+
+                ValidateInstrument(property.Value, property.Name);
+            }
+        }
+
+        private static void ValidateInstrument(JsonElement instrumentElement, string context)
+        {
+            if (instrumentElement.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidOperationException($"Instrument '{context}' must be an object.");
+            }
+
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "ticker",
+                "name",
+                "sourceSymbol"
+            };
+
+            foreach (JsonProperty property in instrumentElement.EnumerateObject())
+            {
+                if (!allowed.Contains(property.Name))
+                {
+                    throw new InvalidOperationException($"Configuration contains unsupported field 'instruments.{context}.{property.Name}'.");
+                }
+            }
+        }
+
+        private static void ValidateUpdate(JsonElement updateElement)
+        {
+            if (updateElement.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidOperationException("update must be an object.");
+            }
+
+            var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "autoUpdateEnabled",
+                "maxAgeDays",
+                "minMinutesBetweenAttempts",
+                "saveUpdatedDataToStore"
+            };
+
+            foreach (JsonProperty property in updateElement.EnumerateObject())
+            {
+                if (!allowed.Contains(property.Name))
+                {
+                    throw new InvalidOperationException($"Configuration contains unsupported field 'update.{property.Name}'.");
+                }
+
+                if (string.Equals(property.Name, "minMinutesBetweenAttempts", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (property.Value.ValueKind != JsonValueKind.Number || !property.Value.TryGetInt32(out _))
+                    {
+                        throw new InvalidOperationException("minMinutesBetweenAttempts must be specified in whole minutes (integer).");
+                    }
                 }
             }
         }

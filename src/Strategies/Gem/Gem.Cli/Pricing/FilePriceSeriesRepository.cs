@@ -5,19 +5,21 @@ namespace Gem.Cli.Pricing
 {
     public sealed class FilePriceSeriesRepository : IPriceSeriesRepository
     {
-        private readonly string _baseDirectory;
+        private readonly string _storeDirectory;
         private readonly IPriceDataProvider _provider;
-        private readonly Dictionary<string, IReadOnlyList<PricePoint>> _cache =
+        private readonly Dictionary<string, IReadOnlyList<PricePoint>> _seriesCache =
             new(StringComparer.OrdinalIgnoreCase);
 
-        public FilePriceSeriesRepository(string baseDirectory, IPriceDataProvider provider)
+        public FilePriceSeriesRepository(
+            string storeDirectory,
+            IPriceDataProvider provider)
         {
-            if (string.IsNullOrWhiteSpace(baseDirectory))
+            if (string.IsNullOrWhiteSpace(storeDirectory))
             {
-                throw new ArgumentException("Cache directory must not be empty.", nameof(baseDirectory));
+                throw new ArgumentException("Store directory must not be empty.", nameof(storeDirectory));
             }
 
-            _baseDirectory = baseDirectory;
+            _storeDirectory = storeDirectory;
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
@@ -28,15 +30,24 @@ namespace Gem.Cli.Pricing
                 throw new ArgumentNullException(nameof(instrument));
             }
 
-            string path = Path.Combine(_baseDirectory, instrument.GetCacheFileName());
+            string symbolKey = instrument.GetNormalizedSymbol();
 
-            if (_cache.TryGetValue(path, out IReadOnlyList<PricePoint>? cached))
+            if (_seriesCache.TryGetValue(symbolKey, out IReadOnlyList<PricePoint>? cached))
             {
                 return cached;
             }
 
+            string path = Path.Combine(_storeDirectory, instrument.GetCacheFileName());
+
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException(
+                    $"Price data file not found for instrument '{instrument.Ticker}' in store directory.",
+                    path);
+            }
+
             IReadOnlyList<PricePoint> series = _provider.LoadSeries(path);
-            _cache[path] = series;
+            _seriesCache[symbolKey] = series;
             return series;
         }
     }

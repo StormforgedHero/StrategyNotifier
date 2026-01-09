@@ -22,12 +22,6 @@ namespace Gem.Cli.Tests.TestSupport
             return path;
         }
 
-        public void EnsureDirectory(params string[] segments)
-        {
-            string path = GetPath(segments);
-            Directory.CreateDirectory(path);
-        }
-
         public void WriteCsv(string content, params string[] relativePathSegments)
         {
             string fullPath = GetPath(relativePathSegments);
@@ -46,12 +40,6 @@ namespace Gem.Cli.Tests.TestSupport
         {
             string fullPath = GetPath(relativePathSegments);
             return File.ReadAllText(fullPath, Utf8TestEncoding.Utf8NoBom);
-        }
-
-        public byte[] ReadAllBytes(params string[] relativePathSegments)
-        {
-            string fullPath = GetPath(relativePathSegments);
-            return File.ReadAllBytes(fullPath);
         }
 
         public void Dispose()

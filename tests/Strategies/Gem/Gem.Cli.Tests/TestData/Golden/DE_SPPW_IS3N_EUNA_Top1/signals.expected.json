@@ -1,6 +1,6 @@
 [
   {
-    "date": "2024-03-28",
+    "date": "2024-04-30",
     "windowMonths": 2,
     "isRiskOn": true,
     "allocations": [
@@ -15,7 +15,7 @@
     "comment": "SPPW.DE return 20.00 % =\u003E risk-on"
   },
   {
-    "date": "2024-04-30",
+    "date": "2024-03-28",
     "windowMonths": 2,
     "isRiskOn": true,
     "allocations": [

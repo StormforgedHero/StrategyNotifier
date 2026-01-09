@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace Gem.Cli.Contracts
 {
     public sealed class SignalOutput

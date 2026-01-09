@@ -12,7 +12,7 @@ public sealed class MissingDataRiskOffOrSkipTests
     public void Run_SkipsMonthWithoutCommonAsOfDate()
     {
         using var workspace = new TemporaryWorkspace();
-        string dataDirectory = workspace.GetPath("data");
+        string storeDirectory = workspace.GetPath("data");
         string outputPath = workspace.GetPath("dist", "gem", "signals.json");
 
         workspace.WriteCsv(
@@ -39,7 +39,7 @@ public sealed class MissingDataRiskOffOrSkipTests
             """,
             "data", "bnd.us.csv");
 
-        GemCliConfiguration configuration = BuildConfiguration(dataDirectory, outputPath, windowMonths: 1);
+        GemCliConfiguration configuration = BuildConfiguration(storeDirectory, outputPath, windowMonths: 1);
         var runner = new GemRunner(configuration, new NoOpPriceDataUpdater(), new LocalCsvPriceDataProvider());
 
         IReadOnlyList<Signal> signals = runner.Run(skipUpdate: true, forceUpdate: false);
@@ -52,7 +52,7 @@ public sealed class MissingDataRiskOffOrSkipTests
     public void Run_SkipsMissingHistoryMonthButProducesLaterSignals()
     {
         using var workspace = new TemporaryWorkspace();
-        string dataDirectory = workspace.GetPath("data");
+        string storeDirectory = workspace.GetPath("data");
         string outputPath = workspace.GetPath("dist", "gem", "signals.json");
 
         workspace.WriteCsv(
@@ -82,19 +82,19 @@ public sealed class MissingDataRiskOffOrSkipTests
             """,
             "data", "bnd.us.csv");
 
-        GemCliConfiguration configuration = BuildConfiguration(dataDirectory, outputPath, windowMonths: 1);
+        GemCliConfiguration configuration = BuildConfiguration(storeDirectory, outputPath, windowMonths: 1);
         var runner = new GemRunner(configuration, new NoOpPriceDataUpdater(), new LocalCsvPriceDataProvider());
 
         IReadOnlyList<Signal> signals = runner.Run(skipUpdate: true, forceUpdate: false);
 
         Assert.Equal(2, signals.Count);
-        Assert.Equal(new DateOnly(2024, 3, 31), signals[0].Date);
-        Assert.Equal(new DateOnly(2024, 4, 30), signals[1].Date);
+        Assert.Equal(new DateOnly(2024, 4, 30), signals[0].Date);
+        Assert.Equal(new DateOnly(2024, 3, 31), signals[1].Date);
         Assert.All(signals, signal => Assert.True(signal.IsRiskOn));
         Assert.All(signals, signal => Assert.Equal("ONE.US", signal.Allocations[0].Instrument.Ticker));
     }
 
-    private static GemCliConfiguration BuildConfiguration(string dataDirectory, string outputPath, int windowMonths)
+    private static GemCliConfiguration BuildConfiguration(string storeDirectory, string outputPath, int windowMonths)
     {
         var riskOne = new Instrument("ONE.US", "One", "one.us");
         var riskTwo = new Instrument("TWO.US", "Two", "two.us");
@@ -102,8 +102,9 @@ public sealed class MissingDataRiskOffOrSkipTests
 
         var momentum = new MomentumParameters(windowMonths, RankingMode.Top1, useAbsoluteMomentum: true, absoluteThreshold: 0m);
         var portfolio = new PortfolioConfiguration(new[] { riskOne, riskTwo }, safe, momentum);
-        var update = new UpdateSettings { Enabled = false, FreshnessDays = 2, MinDelaySeconds = 0 };
+        var update = new UpdateSettings { MaxAgeDays = 2, MinMinutesBetweenAttempts = 0, SaveUpdatedDataToStore = true };
 
-        return new GemCliConfiguration(portfolio, update, dataDirectory, outputPath);
+        string cacheDirectory = Path.Combine(storeDirectory, "..", "cache");
+        return new GemCliConfiguration(portfolio, update, storeDirectory, cacheDirectory, outputPath);
     }
 }

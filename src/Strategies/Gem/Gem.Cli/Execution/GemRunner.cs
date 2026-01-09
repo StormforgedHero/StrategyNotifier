@@ -29,12 +29,14 @@ namespace Gem.Cli.Execution
 
         public IReadOnlyList<Signal> Run(bool skipUpdate, bool forceUpdate)
         {
-            if (_configuration.Update.Enabled && !skipUpdate)
+            bool shouldUpdate = !skipUpdate && (forceUpdate || _configuration.Update.AutoUpdateEnabled);
+
+            if (shouldUpdate)
             {
                 _updater.UpdateAsync(GetAllInstruments(), forceUpdate, CancellationToken.None).GetAwaiter().GetResult();
             }
 
-            var repository = new FilePriceSeriesRepository(_configuration.DataDirectory, _localProvider);
+            var repository = new FilePriceSeriesRepository(_configuration.StoreDirectory, _localProvider);
             var engine = new GemEngine(repository);
 
             IReadOnlyList<Signal> signals = GenerateSignalHistory(engine, repository, _configuration.Portfolio);
@@ -47,9 +49,17 @@ namespace Gem.Cli.Execution
         private static IPriceDataUpdater CreateDefaultUpdater(GemCliConfiguration configuration)
         {
             var httpProvider = new StooqCsvHttpDataProvider();
-            var freshness = TimeSpan.FromDays(configuration.Update.FreshnessDays);
-            var minDelay = TimeSpan.FromSeconds(configuration.Update.MinDelaySeconds);
-            return new PriceDataUpdater(httpProvider, configuration.DataDirectory, freshness, minDelay);
+            var freshness = TimeSpan.FromDays(configuration.Update.MaxAgeDays);
+            var requestDelay = TimeSpan.FromSeconds(1);
+            var attemptCooldown = TimeSpan.FromMinutes(configuration.Update.MinMinutesBetweenAttempts);
+            return new PriceDataUpdater(
+                httpProvider,
+                configuration.CacheDirectory,
+                configuration.StoreDirectory,
+                configuration.Update.SaveUpdatedDataToStore,
+                freshness,
+                requestDelay,
+                attemptCooldown);
         }
 
         private IEnumerable<Instrument> GetAllInstruments()
@@ -123,7 +133,7 @@ namespace Gem.Cli.Execution
             }
 
             return signals
-                .OrderBy(signal => signal.Date)
+                .OrderByDescending(signal => signal.Date)
                 .ToList();
         }
 
@@ -209,6 +219,8 @@ namespace Gem.Cli.Execution
         private static SignalOutput MapToOutput(Signal signal)
         {
             var allocations = signal.Allocations
+                .OrderByDescending(a => a.Weight)
+                .ThenBy(a => a.Instrument.Ticker, StringComparer.Ordinal)
                 .Select(a => new AllocationOutput
                 {
                     Ticker = a.Instrument.Ticker,

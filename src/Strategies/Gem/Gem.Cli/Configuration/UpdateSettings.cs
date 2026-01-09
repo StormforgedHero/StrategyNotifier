@@ -2,22 +2,25 @@ namespace Gem.Cli.Configuration
 {
     public sealed class UpdateSettings
     {
-        public bool Enabled { get; set; } = true;
+        public bool AutoUpdateEnabled { get; set; } = false;
 
-        public int FreshnessDays { get; set; } = 2;
+        public int MaxAgeDays { get; set; } = 2;
 
-        public int MinDelaySeconds { get; set; } = 1;
+        public int MinMinutesBetweenAttempts { get; set; } = 30;
 
-        public void EnsureDefaults()
+        public bool SaveUpdatedDataToStore { get; set; } = true;
+
+        public void Validate()
         {
-            if (FreshnessDays <= 0)
-            {
-                FreshnessDays = 2;
-            }
+            ValidateGreaterOrEqualZero(MaxAgeDays, nameof(MaxAgeDays));
+            ValidateGreaterOrEqualZero(MinMinutesBetweenAttempts, nameof(MinMinutesBetweenAttempts));
+        }
 
-            if (MinDelaySeconds < 0)
+        private static void ValidateGreaterOrEqualZero(int value, string name)
+        {
+            if (value < 0)
             {
-                MinDelaySeconds = 0;
+                throw new InvalidOperationException($"{name} cannot be negative.");
             }
         }
     }

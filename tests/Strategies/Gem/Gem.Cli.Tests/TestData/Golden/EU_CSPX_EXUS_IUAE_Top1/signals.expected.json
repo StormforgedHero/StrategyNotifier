@@ -1,20 +1,5 @@
 [
   {
-    "date": "2024-03-28",
-    "windowMonths": 3,
-    "isRiskOn": true,
-    "allocations": [
-      {
-        "ticker": "CSPX.UK",
-        "name": "CSPX",
-        "weight": 1
-      }
-    ],
-    "absoluteReturn": 0.15,
-    "relativeRank": 1,
-    "comment": "CSPX.UK return 15.00 % =\u003E risk-on"
-  },
-  {
     "date": "2024-04-30",
     "windowMonths": 3,
     "isRiskOn": true,
@@ -28,5 +13,20 @@
     "absoluteReturn": 0.25,
     "relativeRank": 1,
     "comment": "CSPX.UK return 25.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-03-28",
+    "windowMonths": 3,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "CSPX.UK",
+        "name": "CSPX",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.15,
+    "relativeRank": 1,
+    "comment": "CSPX.UK return 15.00 % =\u003E risk-on"
   }
 ]

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace Gem.Cli.Tests.TestSupport
 {
     internal sealed class CurrentDirectoryScope : IDisposable

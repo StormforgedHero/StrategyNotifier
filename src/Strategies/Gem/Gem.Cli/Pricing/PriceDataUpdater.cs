@@ -10,16 +10,23 @@ namespace Gem.Cli.Pricing
     {
         private readonly StooqCsvHttpDataProvider _provider;
         private readonly string _cacheDirectory;
-        private readonly TimeSpan _freshnessWindow;
-        private readonly TimeSpan _minDelay;
+        private readonly string _storeDirectory;
+        private readonly bool _saveUpdatedDataToStore;
+        private readonly TimeSpan _maxAgeWindow;
+        private readonly TimeSpan _requestDelay;
+        private readonly TimeSpan _attemptCooldown;
+        private readonly string _attemptExtension = ".last_attempt";
         private readonly HashSet<string> _requestedSymbols = new(StringComparer.OrdinalIgnoreCase);
         private bool _disposed;
 
         public PriceDataUpdater(
             StooqCsvHttpDataProvider provider,
             string cacheDirectory,
-            TimeSpan freshnessWindow,
-            TimeSpan minDelay)
+            string storeDirectory,
+            bool saveUpdatedDataToStore,
+            TimeSpan maxAgeWindow,
+            TimeSpan requestDelay,
+            TimeSpan attemptCooldown)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
 
@@ -28,9 +35,17 @@ namespace Gem.Cli.Pricing
                 throw new ArgumentException("Cache directory must not be empty.", nameof(cacheDirectory));
             }
 
+            if (string.IsNullOrWhiteSpace(storeDirectory))
+            {
+                throw new ArgumentException("Store directory must not be empty.", nameof(storeDirectory));
+            }
+
             _cacheDirectory = cacheDirectory;
-            _freshnessWindow = freshnessWindow <= TimeSpan.Zero ? TimeSpan.FromDays(2) : freshnessWindow;
-            _minDelay = minDelay < TimeSpan.Zero ? TimeSpan.Zero : minDelay;
+            _storeDirectory = storeDirectory;
+            _saveUpdatedDataToStore = saveUpdatedDataToStore;
+            _maxAgeWindow = maxAgeWindow < TimeSpan.Zero ? TimeSpan.Zero : maxAgeWindow;
+            _requestDelay = requestDelay < TimeSpan.Zero ? TimeSpan.Zero : requestDelay;
+            _attemptCooldown = attemptCooldown < TimeSpan.Zero ? TimeSpan.Zero : attemptCooldown;
         }
 
         public async Task UpdateAsync(
@@ -58,22 +73,45 @@ namespace Gem.Cli.Pricing
                     continue;
                 }
 
-                string path = Path.Combine(_cacheDirectory, $"{symbol}.csv");
+                string cachePath = Path.Combine(_cacheDirectory, $"{symbol}.csv");
+                string storePath = Path.Combine(_storeDirectory, $"{symbol}.csv");
 
-                if (!forceUpdate && !IsStale(path))
+                string attemptPath = Path.Combine(_cacheDirectory, $"{symbol}{_attemptExtension}");
+
+                if (!forceUpdate && !IsStale(cachePath, storePath))
                 {
                     continue;
                 }
 
-                if (!firstRequest && _minDelay > TimeSpan.Zero)
+                if (!forceUpdate && ShouldSkipForCooldown(attemptPath))
                 {
-                    await Task.Delay(_minDelay, cancellationToken);
+                    continue;
                 }
 
-                IReadOnlyList<PricePoint> series = await _provider.LoadSeriesAsync(symbol, cancellationToken);
+                if (!firstRequest && _requestDelay > TimeSpan.Zero)
+                {
+                    await Task.Delay(_requestDelay, cancellationToken);
+                }
 
-                WriteSeries(path, series);
-                firstRequest = false;
+                WriteLastAttempt(attemptPath);
+
+                try
+                {
+                    IReadOnlyList<PricePoint> series = await _provider.LoadSeriesAsync(symbol, cancellationToken);
+
+                    string content = BuildSeriesContent(series);
+
+                    WriteAtomically(cachePath, content);
+
+                    if (_saveUpdatedDataToStore)
+                    {
+                        WriteAtomically(storePath, content);
+                    }
+                }
+                finally
+                {
+                    firstRequest = false;
+                }
             }
         }
 
@@ -88,28 +126,86 @@ namespace Gem.Cli.Pricing
             _provider.Dispose();
         }
 
-        private bool IsStale(string path)
+        private bool IsStale(string cachePath, string storePath)
         {
-            if (!File.Exists(path))
+            DateOnly? latest = _saveUpdatedDataToStore
+                ? TryReadLastDate(storePath)
+                : TryReadLastDate(cachePath);
+
+            if (!latest.HasValue)
             {
                 return true;
             }
 
+            DateOnly threshold = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-_maxAgeWindow.TotalDays));
+            return latest.Value < threshold;
+        }
+
+        private bool ShouldSkipForCooldown(string attemptPath)
+        {
+            if (_attemptCooldown <= TimeSpan.Zero)
+            {
+                return false;
+            }
+
+            DateTimeOffset? lastAttempt = ReadLastAttempt(attemptPath);
+
+            if (lastAttempt is null)
+            {
+                return false;
+            }
+
+            TimeSpan elapsed = DateTimeOffset.UtcNow - lastAttempt.Value;
+            return elapsed < _attemptCooldown;
+        }
+
+        private static DateTimeOffset? ReadLastAttempt(string attemptPath)
+        {
             try
             {
-                using var stream = File.OpenRead(path);
-                IReadOnlyList<PricePoint> series = PriceCsvParser.ParseFromFile(stream);
-                DateOnly lastDate = series.Last().Date;
-                DateOnly threshold = DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(-_freshnessWindow.TotalDays));
-                return lastDate < threshold;
+                if (!File.Exists(attemptPath))
+                {
+                    return null;
+                }
+
+                string content = File.ReadAllText(attemptPath, Encoding.UTF8).Trim();
+                return DateTimeOffset.TryParseExact(content, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsed)
+                    ? parsed
+                    : null;
             }
             catch
             {
-                return true;
+                return null;
             }
         }
 
-        private static void WriteSeries(string path, IReadOnlyList<PricePoint> series)
+        private static void WriteLastAttempt(string attemptPath)
+        {
+            string? directory = Path.GetDirectoryName(attemptPath);
+
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(attemptPath, DateTimeOffset.UtcNow.ToString("O"), FileEncodings.Utf8NoBom);
+        }
+
+        private static void WriteAtomically(string path, string content)
+        {
+            string? directory = Path.GetDirectoryName(path);
+
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            string tempPath = Path.Combine(directory ?? ".", Path.GetRandomFileName());
+            File.WriteAllText(tempPath, content, FileEncodings.Utf8NoBom);
+            File.Move(tempPath, path, overwrite: true);
+        }
+
+        private static string BuildSeriesContent(IReadOnlyList<PricePoint> series)
         {
             var builder = new StringBuilder();
             builder.AppendLine("Date,Close");
@@ -121,7 +217,7 @@ namespace Gem.Cli.Pricing
                 builder.AppendLine(point.Close.ToString(CultureInfo.InvariantCulture));
             }
 
-            File.WriteAllText(path, builder.ToString(), FileEncodings.Utf8NoBom);
+            return builder.ToString();
         }
 
         private static string GetSymbol(Instrument instrument)
@@ -132,6 +228,25 @@ namespace Gem.Cli.Pricing
             }
 
             return instrument.GetNormalizedSymbol();
+        }
+
+        private static DateOnly? TryReadLastDate(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                using var stream = File.OpenRead(path);
+                IReadOnlyList<PricePoint> series = PriceCsvParser.ParseFromFile(stream);
+                return series.Count == 0 ? null : series[^1].Date;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Gem.Domain.Pricing
 
             char delimiter = DetectDelimiter(headerLine);
             string[] header = Split(headerLine, delimiter);
-            ColumnMap map = BuildColumnMap(header, headerLine, delimiter);
+            (int DateIndex, int CloseIndex) map = BuildColumnMap(header, headerLine, delimiter);
 
             var rows = new Dictionary<DateOnly, PricePoint>();
             string? line;
@@ -119,7 +119,7 @@ namespace Gem.Domain.Pricing
             return best;
         }
 
-        private static ColumnMap BuildColumnMap(string[] header, string rawHeader, char delimiter)
+        private static (int DateIndex, int CloseIndex) BuildColumnMap(string[] header, string rawHeader, char delimiter)
         {
             int dateIndex = -1;
             int closeIndex = -1;
@@ -145,7 +145,7 @@ namespace Gem.Domain.Pricing
                     $"CSV header must contain date and close columns. Header='{rawHeader}', delimiter='{delimiter}', normalized=[{normalizedColumns}]. Hint: Stooq uses Data/Zamkniecie.");
             }
 
-            return new ColumnMap(dateIndex, closeIndex);
+            return (dateIndex, closeIndex);
         }
 
         private static bool IsDateColumn(string value)
@@ -273,19 +273,6 @@ namespace Gem.Domain.Pricing
 
             result.Add(current.ToString());
             return result.ToArray();
-        }
-
-        private readonly struct ColumnMap
-        {
-            public ColumnMap(int dateIndex, int closeIndex)
-            {
-                DateIndex = dateIndex;
-                CloseIndex = closeIndex;
-            }
-
-            public int DateIndex { get; }
-
-            public int CloseIndex { get; }
         }
 
         private static bool HasRecognizedColumns(string[] parts)

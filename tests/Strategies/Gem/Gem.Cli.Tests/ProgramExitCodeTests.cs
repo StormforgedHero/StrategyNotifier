@@ -1,4 +1,3 @@
-using Gem.Cli;
 using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests;
@@ -29,6 +28,7 @@ public sealed class ProgramExitCodeTests
     {
         using var workspace = new TemporaryWorkspace();
         string dataDir = workspace.GetPath("data");
+        string cacheDir = workspace.GetPath("cache");
         string outputPath = workspace.GetPath("dist", "gem", "signals.json");
 
         string json = $$"""
@@ -36,13 +36,14 @@ public sealed class ProgramExitCodeTests
           "windowMonths": 3,
           "rankingMode": "Top1",
           "instruments": {
-            "usEquity": { "ticker": "VOO.US" },
-            "exUsEquity": { "ticker": "VEU.US" },
-            "safeAsset": { "ticker": "AGG.US" }
+            "usEquity": { "ticker": "VOO.US", "name": "VOO", "sourceSymbol": "voo.us" },
+            "exUsEquity": { "ticker": "VEU.US", "name": "VEU", "sourceSymbol": "veu.us" },
+            "safeAsset": { "ticker": "AGG.US", "name": "AGG", "sourceSymbol": "agg.us" }
           },
-          "dataDirectory": "{{dataDir.Replace("\\", "\\\\")}}",
+          "storeDirectory": "{{dataDir.Replace("\\", "\\\\")}}",
+          "cacheDirectory": "{{cacheDir.Replace("\\", "\\\\")}}",
           "outputPath": "{{outputPath.Replace("\\", "\\\\")}}",
-          "update": { "enabledByDefault": false, "freshnessDays": 2 }
+          "update": { "autoUpdateEnabled": false, "maxAgeDays": 2 }
         }
         """;
 
@@ -59,6 +60,7 @@ public sealed class ProgramExitCodeTests
         using var workspace = new TemporaryWorkspace();
         string dataDir = workspace.GetPath("data");
         Directory.CreateDirectory(dataDir);
+        string cacheDir = workspace.GetPath("cache");
 
         WritePriceFile(dataDir, "voo.us.csv");
         WritePriceFile(dataDir, "veu.us.csv");
@@ -71,13 +73,14 @@ public sealed class ProgramExitCodeTests
           "windowMonths": 3,
           "rankingMode": "Top1",
           "instruments": {
-            "usEquity": { "ticker": "VOO.US" },
-            "exUsEquity": { "ticker": "VEU.US" },
-            "safeAsset": { "ticker": "AGG.US" }
+            "usEquity": { "ticker": "VOO.US", "name": "VOO", "sourceSymbol": "voo.us" },
+            "exUsEquity": { "ticker": "VEU.US", "name": "VEU", "sourceSymbol": "veu.us" },
+            "safeAsset": { "ticker": "AGG.US", "name": "AGG", "sourceSymbol": "agg.us" }
           },
-          "dataDirectory": "{{dataDir.Replace("\\", "\\\\")}}",
+          "storeDirectory": "{{dataDir.Replace("\\", "\\\\")}}",
+          "cacheDirectory": "{{cacheDir.Replace("\\", "\\\\")}}",
           "outputPath": "{{outputPath.Replace("\\", "\\\\")}}",
-          "update": { "enabledByDefault": false, "freshnessDays": 2 }
+          "update": { "autoUpdateEnabled": false, "maxAgeDays": 2 }
         }
         """;
 

@@ -2,13 +2,12 @@
   "windowMonths": 2,
   "rankingMode": "Top1",
   "instruments": {
-    "riskOn": [
-      { "ticker": "VOO.US", "name": "US Equity", "sourceSymbol": "voo.us" },
-      { "ticker": "VEU.US", "name": "Ex-US Equity", "sourceSymbol": "veu.us" }
-    ],
+    "usEquity": { "ticker": "VOO.US", "name": "US Equity", "sourceSymbol": "voo.us" },
+    "exUsEquity": { "ticker": "VEU.US", "name": "Ex-US Equity", "sourceSymbol": "veu.us" },
     "safeAsset": { "ticker": "AGG.US", "name": "Bonds", "sourceSymbol": "agg.us" }
   },
-  "dataDirectory": "data",
+  "storeDirectory": "data",
+  "cacheDirectory": "cache",
   "outputPath": "dist/gem/signals.json",
-  "update": { "enabledByDefault": false }
+  "update": { "autoUpdateEnabled": false }
 }

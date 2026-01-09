@@ -1,7 +1,6 @@
+using Gem.Cli.Tests.TestSupport;
 using System.Globalization;
 using System.Text.Json;
-using Gem.Cli;
-using Gem.Cli.Tests.TestSupport;
 
 namespace Gem.Cli.Tests;
 
@@ -15,7 +14,7 @@ public sealed class GemCliEndToEndTests
         WriteSamplePrices(dataDirectory);
 
         string outputPath = workspace.GetPath("dist", "gem", "signals.json");
-        WriteConfig(workspace, dataDirectory, outputPath, windowMonths: 3, updateEnabled: false);
+        WriteConfig(workspace, dataDirectory, outputPath, windowMonths: 3);
 
         int exitCode = Program.Run(workspace.Root, new StringWriter(), new StringWriter(), Array.Empty<string>());
 
@@ -29,35 +28,52 @@ public sealed class GemCliEndToEndTests
         Assert.Equal(JsonValueKind.Array, root.ValueKind);
         Assert.True(root.GetArrayLength() >= 1);
 
-        JsonElement first = root[0];
-        Assert.True(first.TryGetProperty("date", out JsonElement dateElement));
+        var dates = new List<DateOnly>();
+        var seenMonths = new HashSet<string>(StringComparer.Ordinal);
 
-        string? dateString = dateElement.GetString();
-        Assert.False(string.IsNullOrWhiteSpace(dateString));
-
-        DateOnly firstDate = DateOnly.ParseExact(dateString!, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-
-        if (root.GetArrayLength() > 1)
+        for (int i = 0; i < root.GetArrayLength(); i++)
         {
-            string secondDateString = root[1].GetProperty("date").GetString() ?? throw new InvalidOperationException("Missing date in second signal.");
-            DateOnly secondDate = DateOnly.ParseExact(secondDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            Assert.True(firstDate <= secondDate);
+            JsonElement signal = root[i];
+            Assert.True(signal.TryGetProperty("date", out JsonElement dateElement));
+            Assert.True(signal.TryGetProperty("windowMonths", out JsonElement windowElement));
+            Assert.True(signal.TryGetProperty("isRiskOn", out JsonElement riskOnElement));
+            Assert.True(signal.TryGetProperty("absoluteReturn", out JsonElement absoluteReturnElement));
+            Assert.True(signal.TryGetProperty("relativeRank", out JsonElement relativeRankElement));
+            Assert.True(signal.TryGetProperty("comment", out JsonElement commentElement));
+            Assert.True(signal.TryGetProperty("allocations", out JsonElement allocationsElement));
+
+            Assert.Equal(JsonValueKind.String, dateElement.ValueKind);
+            Assert.True(windowElement.ValueKind is JsonValueKind.Number);
+            Assert.True(riskOnElement.ValueKind is JsonValueKind.True or JsonValueKind.False);
+            Assert.True(absoluteReturnElement.ValueKind is JsonValueKind.Number);
+            Assert.True(relativeRankElement.ValueKind is JsonValueKind.Number);
+            Assert.Equal(JsonValueKind.String, commentElement.ValueKind);
+            Assert.Equal(JsonValueKind.Array, allocationsElement.ValueKind);
+
+            string dateString = dateElement.GetString() ?? throw new InvalidOperationException("Missing date value.");
+            DateOnly parsedDate = DateOnly.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            dates.Add(parsedDate);
+
+            string monthKey = $"{parsedDate.Year:D4}-{parsedDate.Month:D2}";
+            Assert.True(seenMonths.Add(monthKey), "Duplicate month detected in signals.");
+
+            Assert.True(allocationsElement.GetArrayLength() >= 1);
+
+            JsonElement allocation = allocationsElement[0];
+            Assert.True(allocation.TryGetProperty("ticker", out JsonElement tickerElement));
+            Assert.True(allocation.TryGetProperty("name", out JsonElement nameElement));
+            Assert.True(allocation.TryGetProperty("weight", out JsonElement weightElement));
+
+            Assert.Equal(JsonValueKind.String, tickerElement.ValueKind);
+            Assert.Equal(JsonValueKind.String, nameElement.ValueKind);
+            Assert.True(weightElement.ValueKind is JsonValueKind.Number);
+            Assert.False(string.IsNullOrWhiteSpace(commentElement.GetString()));
         }
 
-        Assert.True(first.TryGetProperty("windowMonths", out _));
-        Assert.True(first.TryGetProperty("isRiskOn", out _));
-        Assert.True(first.TryGetProperty("absoluteReturn", out _));
-        Assert.True(first.TryGetProperty("relativeRank", out _));
-        Assert.True(first.TryGetProperty("comment", out _));
-
-        JsonElement allocations = first.GetProperty("allocations");
-        Assert.Equal(JsonValueKind.Array, allocations.ValueKind);
-        Assert.True(allocations.GetArrayLength() >= 1);
-
-        JsonElement allocation = allocations[0];
-        Assert.True(allocation.TryGetProperty("ticker", out _));
-        Assert.True(allocation.TryGetProperty("name", out _));
-        Assert.True(allocation.TryGetProperty("weight", out _));
+        for (int i = 1; i < dates.Count; i++)
+        {
+            Assert.True(dates[i - 1] >= dates[i], "Signals must be ordered newest-first by date.");
+        }
     }
 
     [Fact]
@@ -73,9 +89,25 @@ public sealed class GemCliEndToEndTests
         }
 
         string outputPath = workspace.GetPath("dist", "gem", "signals.json");
-        WriteConfig(workspace, dataDirectory, outputPath, windowMonths: 3, updateEnabled: true);
+        WriteConfig(workspace, dataDirectory, outputPath, windowMonths: 3);
 
         int exitCode = Program.Run(workspace.Root, new StringWriter(), new StringWriter(), new[] { "--no-update" });
+
+        Assert.Equal(Program.ExitCodeSuccess, exitCode);
+        Assert.True(File.Exists(outputPath));
+    }
+
+    [Fact]
+    public void Program_CreatesOutputDirectoryWhenMissing()
+    {
+        using var workspace = new TemporaryWorkspace();
+        string dataDirectory = workspace.GetPath("data", "gem", "cache");
+        WriteSamplePrices(dataDirectory);
+
+        string outputPath = workspace.GetPath("out", "nested", "gem", "signals.json");
+        WriteConfig(workspace, dataDirectory, outputPath, windowMonths: 3);
+
+        int exitCode = Program.Run(workspace.Root, new StringWriter(), new StringWriter(), Array.Empty<string>());
 
         Assert.Equal(Program.ExitCodeSuccess, exitCode);
         Assert.True(File.Exists(outputPath));
@@ -132,8 +164,7 @@ public sealed class GemCliEndToEndTests
         TemporaryWorkspace workspace,
         string dataDirectory,
         string outputPath,
-        int windowMonths,
-        bool updateEnabled)
+        int windowMonths)
     {
         string json = $$"""
         {
@@ -144,12 +175,14 @@ public sealed class GemCliEndToEndTests
             "exUsEquity": { "ticker": "VEU.US", "name": "Ex-US Equity", "sourceSymbol": "veu.us" },
             "safeAsset": { "ticker": "AGG.US", "name": "Bonds", "sourceSymbol": "agg.us" }
           },
-          "dataDirectory": "{{dataDirectory.Replace("\\", "\\\\")}}",
+          "storeDirectory": "{{dataDirectory.Replace("\\", "\\\\")}}",
+          "cacheDirectory": "{{workspace.GetPath("cache").Replace("\\", "\\\\")}}",
           "outputPath": "{{outputPath.Replace("\\", "\\\\")}}",
           "update": {
-            "enabledByDefault": {{(updateEnabled ? "true" : "false")}},
-            "freshnessDays": 2,
-            "minHoursBetweenUpdates": 0.01
+            "autoUpdateEnabled": false,
+            "maxAgeDays": 2,
+            "minMinutesBetweenAttempts": 0,
+            "saveUpdatedDataToStore": true
           }
         }
         """;

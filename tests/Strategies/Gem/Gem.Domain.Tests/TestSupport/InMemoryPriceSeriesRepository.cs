@@ -3,22 +3,17 @@ using Gem.Domain.Pricing;
 
 namespace Gem.Domain.Tests.TestSupport;
 
-internal sealed class DictionaryPriceSeriesRepository : IPriceSeriesRepository
+internal sealed class InMemoryPriceSeriesRepository : IPriceSeriesRepository
 {
-    private readonly IReadOnlyDictionary<string, IReadOnlyList<PricePoint>> _data;
+    private readonly Dictionary<string, IReadOnlyList<PricePoint>> _data;
 
-    public DictionaryPriceSeriesRepository(IReadOnlyDictionary<string, IReadOnlyList<PricePoint>> data)
+    public InMemoryPriceSeriesRepository(Dictionary<string, IReadOnlyList<PricePoint>> data)
     {
-        _data = data;
+        _data = data ?? throw new ArgumentNullException(nameof(data));
     }
 
     public IReadOnlyList<PricePoint> GetSeries(Instrument instrument)
     {
-        if (instrument is null)
-        {
-            throw new ArgumentNullException(nameof(instrument));
-        }
-
         if (!_data.TryGetValue(instrument.Ticker, out IReadOnlyList<PricePoint>? series))
         {
             throw new InvalidOperationException($"Missing price series for {instrument.Ticker}.");

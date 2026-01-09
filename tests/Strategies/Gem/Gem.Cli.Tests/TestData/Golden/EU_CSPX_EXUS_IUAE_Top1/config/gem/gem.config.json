@@ -2,13 +2,12 @@
   "windowMonths": 3,
   "rankingMode": "Top1",
   "instruments": {
-    "riskOn": [
-      { "ticker": "CSPX.UK", "name": "CSPX", "sourceSymbol": "cspx.uk" },
-      { "ticker": "EXUS.DE", "name": "EXUS", "sourceSymbol": "exus.de" }
-    ],
+    "usEquity": { "ticker": "CSPX.UK", "name": "CSPX", "sourceSymbol": "cspx.uk" },
+    "exUsEquity": { "ticker": "EXUS.DE", "name": "EXUS", "sourceSymbol": "exus.de" },
     "safeAsset": { "ticker": "IUAE.UK", "name": "IUAE", "sourceSymbol": "iuae.uk" }
   },
-  "dataDirectory": "data",
+  "storeDirectory": "data",
+  "cacheDirectory": "cache",
   "outputPath": "dist/gem/signals.json",
-  "update": { "enabledByDefault": false }
+  "update": { "autoUpdateEnabled": false }
 }

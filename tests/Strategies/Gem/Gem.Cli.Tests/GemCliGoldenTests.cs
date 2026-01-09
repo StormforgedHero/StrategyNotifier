@@ -1,8 +1,7 @@
-using System.Globalization;
-using System.Text.Json;
-using Gem.Cli;
 using Gem.Cli.Contracts;
 using Gem.Cli.Tests.TestSupport;
+using System.Globalization;
+using System.Text.Json;
 
 namespace Gem.Cli.Tests;
 
@@ -49,7 +48,7 @@ public sealed class GemCliGoldenTests
     }
 
     [Fact]
-    public void Normalization_SortsSignalsAndAllocations()
+    public void Normalization_PreservesOrderAndFormats()
     {
         var unsorted = new List<SignalOutput>
         {
@@ -74,7 +73,7 @@ public sealed class GemCliGoldenTests
                 IsRiskOn = true,
                 AbsoluteReturn = 0.2m,
                 RelativeRank = 1,
-                Comment = "test",
+                Comment = null!,
                 Allocations = new[]
                 {
                     new AllocationOutput { Ticker = "C", Name = "C", Weight = 0.3m },
@@ -85,10 +84,9 @@ public sealed class GemCliGoldenTests
 
         IReadOnlyList<SignalOutput> normalized = Normalize(unsorted);
 
-        Assert.Equal("2024-01-31", normalized[0].Date);
-        Assert.Equal(new[] { "D", "C" }, normalized[0].Allocations.Select(a => a.Ticker));
-        Assert.Equal("2024-02-29", normalized[1].Date);
-        Assert.Equal(new[] { "A", "B" }, normalized[1].Allocations.Select(a => a.Ticker));
+        Assert.Equal(new[] { "2024-02-29", "2024-01-31" }, normalized.Select(s => s.Date));
+        Assert.Equal(new[] { "B", "A" }, normalized[0].Allocations.Select(a => a.Ticker));
+        Assert.Equal(string.Empty, normalized[1].Comment);
     }
 
     private static void AssertSnapshotsMatch(string expectedPath, string actualPath)
@@ -155,15 +153,12 @@ public sealed class GemCliGoldenTests
                 Comment = signal.Comment ?? string.Empty,
                 Allocations = NormalizeAllocations(signal.Allocations)
             })
-            .OrderBy(signal => signal.Date, StringComparer.Ordinal)
             .ToList();
     }
 
-    private static IReadOnlyList<AllocationOutput> NormalizeAllocations(IReadOnlyList<AllocationOutput> allocations)
+    private static IReadOnlyList<AllocationOutput> NormalizeAllocations(IReadOnlyList<AllocationOutput>? allocations)
     {
-        return allocations
-            .OrderByDescending(a => a.Weight)
-            .ThenBy(a => a.Ticker, StringComparer.Ordinal)
+        return (allocations ?? Array.Empty<AllocationOutput>())
             .Select(a => new AllocationOutput
             {
                 Ticker = a.Ticker,

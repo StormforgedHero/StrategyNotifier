@@ -7,15 +7,21 @@ namespace Gem.Cli.Configuration
         public GemCliConfiguration(
             PortfolioConfiguration portfolio,
             UpdateSettings update,
-            string dataDirectory,
+            string storeDirectory,
+            string cacheDirectory,
             string outputSignalsFile)
         {
             Portfolio = portfolio ?? throw new ArgumentNullException(nameof(portfolio));
             Update = update ?? throw new ArgumentNullException(nameof(update));
 
-            if (string.IsNullOrWhiteSpace(dataDirectory))
+            if (string.IsNullOrWhiteSpace(storeDirectory))
             {
-                throw new ArgumentException("Data directory must be provided.", nameof(dataDirectory));
+                throw new ArgumentException("Store directory must be provided.", nameof(storeDirectory));
+            }
+
+            if (string.IsNullOrWhiteSpace(cacheDirectory))
+            {
+                throw new ArgumentException("Cache directory must be provided.", nameof(cacheDirectory));
             }
 
             if (string.IsNullOrWhiteSpace(outputSignalsFile))
@@ -23,7 +29,8 @@ namespace Gem.Cli.Configuration
                 throw new ArgumentException("Output file must be provided.", nameof(outputSignalsFile));
             }
 
-            DataDirectory = dataDirectory;
+            StoreDirectory = storeDirectory;
+            CacheDirectory = cacheDirectory;
             OutputSignalsFile = outputSignalsFile;
         }
 
@@ -31,14 +38,24 @@ namespace Gem.Cli.Configuration
 
         public UpdateSettings Update { get; }
 
-        public string DataDirectory { get; private set; }
+        public string StoreDirectory { get; private set; }
+
+        public string CacheDirectory { get; private set; }
 
         public string OutputSignalsFile { get; private set; }
 
         public void NormalizePaths(string workingDirectory)
         {
-            DataDirectory = NormalizePath(DataDirectory, workingDirectory);
+            StoreDirectory = NormalizePath(StoreDirectory, workingDirectory);
+            CacheDirectory = NormalizePath(CacheDirectory, workingDirectory);
             OutputSignalsFile = NormalizePath(OutputSignalsFile, workingDirectory);
+
+            if (!Directory.Exists(StoreDirectory))
+            {
+                throw new FileNotFoundException($"Store directory '{StoreDirectory}' does not exist.", StoreDirectory);
+            }
+
+            Directory.CreateDirectory(CacheDirectory);
         }
 
         private static string NormalizePath(string value, string workingDirectory)

@@ -1,7 +1,7 @@
 using Gem.Domain.Engine;
 using Gem.Domain.Exceptions;
 using Gem.Domain.Model;
-using Gem.Domain.Pricing;
+using Gem.Domain.Tests.TestSupport;
 
 namespace Gem.Domain.Tests;
 
@@ -185,23 +185,4 @@ public sealed class GemEngineTests
             () => engine.GenerateSignal(new DateOnly(2024, 2, 28), portfolio));
     }
 
-    private sealed class InMemoryPriceSeriesRepository : IPriceSeriesRepository
-    {
-        private readonly Dictionary<string, IReadOnlyList<PricePoint>> _data;
-
-        public InMemoryPriceSeriesRepository(Dictionary<string, IReadOnlyList<PricePoint>> data)
-        {
-            _data = data;
-        }
-
-        public IReadOnlyList<PricePoint> GetSeries(Instrument instrument)
-        {
-            if (!_data.TryGetValue(instrument.Ticker, out IReadOnlyList<PricePoint>? series))
-            {
-                throw new InvalidOperationException($"Missing price series for {instrument.Ticker}.");
-            }
-
-            return series;
-        }
-    }
 }

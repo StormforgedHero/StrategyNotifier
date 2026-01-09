@@ -6,11 +6,13 @@
     "exUsEquity": { "ticker": "VEU.US", "name": "Ex-US Equity", "sourceSymbol": "veu.us" },
     "safeAsset": { "ticker": "AGG.US", "name": "Bonds", "sourceSymbol": "agg.us" }
   },
-  "dataDirectory": "data/gem/sample",
+  "storeDirectory": "data/gem/sample",
+  "cacheDirectory": "data/gem/cache",
   "outputPath": "dist/gem/signals.json",
   "update": {
-    "enabledByDefault": true,
-    "freshnessDays": 2,
-    "minHoursBetweenUpdates": 0.01
+    "autoUpdateEnabled": false,
+    "maxAgeDays": 2,
+    "minMinutesBetweenAttempts": 30,
+    "saveUpdatedDataToStore": true
   }
 }

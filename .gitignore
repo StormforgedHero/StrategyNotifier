@@ -420,12 +420,12 @@ FodyWeavers.xsd
 # StrategyNotifier: GEM data folders
 # Real market data should stay local and never be committed
 data/gem/raw/
+data/gem/cache/
 
 # StrategyNotifier: GEM CLI configuration
-# Ignore user-specific configuration; keep the sample file in version control
+# Ignore user-specific CLI override
 config/gem/gem.cli.json
 
 # StrategyNotifier: output artifacts
-# Ignore all runtime output under dist, but keep directory skeletons tracked via .gitkeep
+# Ignore runtime output
 dist/
-!dist/**/.gitkeep

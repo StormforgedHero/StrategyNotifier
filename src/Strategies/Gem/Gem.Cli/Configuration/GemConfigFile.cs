@@ -10,7 +10,9 @@ namespace Gem.Cli.Configuration
 
         public UpdateConfig? Update { get; set; }
 
-        public string? DataDirectory { get; set; }
+        public string? StoreDirectory { get; set; }
+
+        public string? CacheDirectory { get; set; }
 
         public string? OutputPath { get; set; }
     }
