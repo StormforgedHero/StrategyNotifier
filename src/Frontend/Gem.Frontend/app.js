@@ -3,9 +3,25 @@
   const LANG_STORAGE_KEY = 'gem-lang';
   const I18N_PATH = './i18n/';
   const SUPPORTED_LANGS = ['en', 'pl'];
-  const LIVE_MANIFEST_PATH = '/dist/gem/profiles.json';
-  const DEMO_MANIFEST_PATH = './demo/profiles.json';
+  const LIVE_MANIFEST_PATH = 'dist/gem/profiles.json';
+  const DEMO_MANIFEST_PATH = 'demo/profiles.json';
   const HISTORY_DEFAULT_COUNT = 12;
+  const FRONTEND_SEGMENT = '/src/Frontend/Gem.Frontend/';
+  const DEFAULT_I18N = {
+    brandTag: 'GEM',
+    brandTitle: 'GEM Signals',
+    loadingProfiles: 'Loading profiles...',
+    statusIdle: 'Loading...',
+    statusManifestMissing: 'Manifest not found. Generate signals and serve the repo root to create dist/gem/profiles.json.',
+    instructionGenerateAll: 'Generate signals: dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update.',
+    instructionRunCommandRoot: 'Serve repo root: python -m http.server 8000 (from repo root), then open http://localhost:8000/.',
+    demoFallbackMessage: 'Live data unavailable ({error}). Showing demo data; use Refresh to retry live.',
+    refreshButton: 'Refresh view',
+    fatalError: 'Fatal error',
+    liveOnlyError: 'Live mode failed: {error}. Demo fallback disabled.',
+    demoUnavailable: 'Demo manifest not available ({error}).',
+    unavailable: 'Unavailable'
+  };
 
   const elements = {
     profileSelect: document.getElementById('profile-select'),
@@ -18,6 +34,8 @@
     freshnessLoaded: document.getElementById('freshness-loaded'),
     errorPanel: document.getElementById('error-panel'),
     errorMessage: document.getElementById('error-message'),
+    fallbackBanner: document.getElementById('fallback-banner'),
+    fallbackMessage: document.getElementById('fallback-message'),
     orderWarning: document.getElementById('order-warning'),
     currentCard: document.getElementById('current-card'),
     historyCard: document.getElementById('history-card'),
@@ -41,18 +59,44 @@
   let currentProfileId = null;
   let cacheBuster = 0;
   let source = 'live';
-  let manifestState = { ok: false, source: 'live', url: null, lastModified: '', loadedAt: null };
+  let sourcePreference = 'auto';
+  let manifestState = { ok: false, source: 'live', url: null, lastModified: '', loadedAt: null, errorMessage: '', fallbackReason: '' };
   let lastProfile = null;
   let lastSignals = null;
   let lastSignalsMeta = null;
   let lastError = null;
   let showAllHistory = false;
 
+  function ensureTrailingSlash(path) {
+    if (!path) return '/';
+    let value = path;
+    if (!value.startsWith('/')) {
+      value = `/${value}`;
+    }
+    if (!value.endsWith('/')) {
+      value = `${value}/`;
+    }
+    return value;
+  }
+
+  function getRepoRootBase() {
+    const pathname = window.location.pathname || '/';
+    const segmentIndex = pathname.indexOf(FRONTEND_SEGMENT);
+    if (segmentIndex !== -1) {
+      return ensureTrailingSlash(pathname.slice(0, segmentIndex));
+    }
+
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length === 0) return '/';
+    return ensureTrailingSlash(parts[0]);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     bootstrap().catch((err) => showFatalError(err instanceof Error ? err.message : String(err)));
   });
 
   async function bootstrap() {
+    resolvePreferencesFromUrl();
     await setupLanguage();
     applyStaticTranslations();
     clearFreshness();
@@ -82,6 +126,7 @@
       currentLang = lang;
       persistLanguage(lang);
       applyStaticTranslations();
+      updateFallbackBanner(manifestState);
       rerenderFromCache();
     });
   }
@@ -90,16 +135,17 @@
     const chosen = normalizeLang(lang);
     const fallbackLang = 'en';
 
-    fallbackTranslations = await fetchTranslations(fallbackLang);
+    fallbackTranslations = await fetchTranslations(fallbackLang, DEFAULT_I18N);
     translations = chosen === fallbackLang ? fallbackTranslations : await fetchTranslations(chosen, fallbackTranslations);
   }
 
-  async function fetchTranslations(lang, fallback = {}) {
+  async function fetchTranslations(lang, fallback = DEFAULT_I18N) {
     try {
       const response = await fetch(`${I18N_PATH}${lang}.json`, { cache: 'no-store' });
       if (!response.ok) throw new Error('Translation fetch failed');
-      return await response.json();
-    } catch {
+      const data = await response.json();
+      return { ...fallback, ...data };
+    } catch (_) {
       return fallback;
     }
   }
@@ -127,6 +173,18 @@
     });
   }
 
+  function resolvePreferencesFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    sourcePreference = normalizeSourcePreference(params.get('source'));
+  }
+
+  function normalizeSourcePreference(value) {
+    if (!value) return 'auto';
+    const lower = value.toLowerCase();
+    if (lower === 'live' || lower === 'demo') return lower;
+    return 'auto';
+  }
+
   function rerenderFromCache() {
     if (!manifestState.ok) {
       showInstruction(t('statusManifestMissing'), true);
@@ -149,15 +207,26 @@
   }
 
   async function loadAndRender(forceRefresh = false) {
+    resolvePreferencesFromUrl();
     const manifest = await loadManifest(forceRefresh);
     source = manifest.source;
     if (!manifest.ok || !Array.isArray(manifest.profiles) || manifest.profiles.length === 0) {
-      manifestState = { ok: false, source: manifest.source, url: manifest.url?.toString() ?? null, lastModified: '', loadedAt: manifest.loadedAt ?? null };
+      manifestUrl = null;
+      manifestState = {
+        ok: false,
+        source: manifest.source,
+        url: manifest.url?.toString() ?? null,
+        lastModified: '',
+        loadedAt: manifest.loadedAt ?? null,
+        errorMessage: manifest.errorMessage || '',
+        fallbackReason: manifest.fallbackReason || ''
+      };
       lastProfile = null;
       lastSignals = null;
       lastSignalsMeta = null;
       lastError = null;
       clearFreshness();
+      updateFallbackBanner(manifestState);
       showInstruction(t('statusManifestMissing'), true);
       return;
     }
@@ -167,12 +236,16 @@
       source: manifest.source,
       url: manifest.url.toString(),
       lastModified: manifest.lastModified || '',
-      loadedAt: manifest.loadedAt || Date.now()
+      loadedAt: manifest.loadedAt || Date.now(),
+      errorMessage: manifest.errorMessage || '',
+      fallbackReason: manifest.fallbackReason || ''
     };
     lastError = null;
     profiles = manifest.profiles;
     manifestUrl = manifest.url;
     source = manifest.source;
+
+    updateFallbackBanner(manifestState);
 
     setupProfileOptions(profiles);
     const initialProfileId = currentProfileId && profiles.some((p) => p.id === currentProfileId)
@@ -191,15 +264,22 @@
     await loadProfile(initialProfileId, forceRefresh);
   }
 
-  async function loadManifest(forceRefresh) {
-    const url = new URL(LIVE_MANIFEST_PATH, window.location.origin);
+  function buildManifestUrl(relativePath, forceRefresh, baseOverride) {
+    const base = baseOverride || new URL('.', window.location.href);
+    const url = new URL(relativePath, base);
     if (forceRefresh || cacheBuster) {
       url.searchParams.set('t', (cacheBuster || Date.now()).toString());
     }
+    return url;
+  }
 
+  async function fetchManifest(url, source) {
     try {
       const response = await fetch(url.toString(), { cache: 'no-store' });
-      if (!response.ok) throw new Error('Manifest fetch failed');
+      if (!response.ok) {
+        const statusText = `${response.status} ${response.statusText}`.trim();
+        throw new Error(statusText || 'Manifest fetch failed');
+      }
       const data = await response.json();
       const profilesList = data.profiles ?? [];
 
@@ -207,29 +287,110 @@
         ok: true,
         profiles: profilesList,
         url,
-        source: 'live',
+        source,
         lastModified: response.headers.get('Last-Modified') || '',
         loadedAt: Date.now()
       };
-    } catch {
-      try {
-        const demoUrl = new URL(DEMO_MANIFEST_PATH, window.location.href);
-        const response = await fetch(demoUrl.toString(), { cache: 'no-store' });
-        if (!response.ok) throw new Error('Demo manifest fetch failed');
-        const data = await response.json();
-        const profilesList = data.profiles ?? [];
-        return {
-          ok: true,
-          profiles: profilesList,
-          url: demoUrl,
-          source: 'demo',
-          lastModified: response.headers.get('Last-Modified') || '',
-          loadedAt: Date.now()
-        };
-      } catch {
-        return { ok: false, profiles: [], url: new URL('./', window.location.href), source: 'none', loadedAt: Date.now() };
-      }
+    } catch (error) {
+      return {
+        ok: false,
+        profiles: [],
+        url,
+        source,
+        errorMessage: formatError(error),
+        lastModified: '',
+        loadedAt: Date.now()
+      };
     }
+  }
+
+  function formatError(error) {
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+    if (typeof error === 'string' && error.trim()) {
+      return error;
+    }
+    return 'Manifest fetch failed';
+  }
+
+  async function loadManifest(forceRefresh) {
+    const liveBase = new URL(getRepoRootBase(), window.location.origin);
+    const liveUrl = buildManifestUrl(LIVE_MANIFEST_PATH, forceRefresh, liveBase);
+    const liveResult = await fetchManifest(liveUrl, 'live');
+
+    const demoPrimaryBase = new URL('.', window.location.href);
+    const demoSecondaryBase = new URL(`${getRepoRootBase()}src/Frontend/Gem.Frontend/`, window.location.origin);
+
+    if (sourcePreference === 'live') {
+      if (liveResult.ok) return liveResult;
+      return {
+        ...liveResult,
+        ok: false,
+        source: 'live',
+        fallbackReason: t('liveOnlyError', { error: liveResult.errorMessage || t('unavailable') })
+      };
+    }
+
+    if (sourcePreference === 'demo') {
+      const demoResult = await loadDemoManifest(forceRefresh, demoPrimaryBase, demoSecondaryBase);
+      if (demoResult.ok) return demoResult;
+      return {
+        ...demoResult,
+        ok: false,
+        source: 'demo',
+        fallbackReason: t('demoUnavailable', { error: demoResult.errorMessage || t('unavailable') })
+      };
+    }
+
+    if (liveResult.ok) {
+      return liveResult;
+    }
+
+    const demoResult = await loadDemoManifest(forceRefresh, demoPrimaryBase, demoSecondaryBase, liveResult.errorMessage);
+    if (demoResult.ok) {
+      return demoResult;
+    }
+
+    const combinedReason = [liveResult.errorMessage, demoResult.errorMessage].filter(Boolean).join('; ');
+    return {
+      ok: false,
+      profiles: [],
+      url: liveResult.url || demoResult.url || new URL('./', window.location.href),
+      source: 'none',
+      errorMessage: combinedReason || t('unavailable'),
+      lastModified: '',
+      loadedAt: Date.now(),
+      fallbackReason: combinedReason
+    };
+  }
+
+  async function loadDemoManifest(forceRefresh, primaryBase, secondaryBase, fallbackReason) {
+    const primaryUrl = buildManifestUrl(DEMO_MANIFEST_PATH, forceRefresh, primaryBase);
+    const primaryResult = await fetchManifest(primaryUrl, 'demo');
+    if (primaryResult.ok) {
+      return { ...primaryResult, fallbackReason: fallbackReason || '' };
+    }
+
+    const secondaryUrl = buildManifestUrl(DEMO_MANIFEST_PATH, forceRefresh, secondaryBase);
+    const secondaryResult = await fetchManifest(secondaryUrl, 'demo');
+    if (secondaryResult.ok) {
+      return {
+        ...secondaryResult,
+        fallbackReason: fallbackReason || primaryResult.errorMessage || ''
+      };
+    }
+
+    return {
+      ok: false,
+      profiles: [],
+      url: secondaryResult.url || primaryResult.url,
+      source: 'demo',
+      errorMessage: secondaryResult.errorMessage || primaryResult.errorMessage,
+      lastModified: '',
+      loadedAt: Date.now(),
+      fallbackReason: fallbackReason || primaryResult.errorMessage || ''
+    };
   }
 
   async function loadProfile(profileId, forceRefresh) {
@@ -248,7 +409,8 @@
     updateCommand(profile.id);
 
     try {
-      const signalsUrl = new URL(profile.signalsPath, manifestUrl);
+      const manifestBaseUrl = new URL('.', manifestUrl);
+      const signalsUrl = new URL(profile.signalsPath, manifestBaseUrl);
       if (forceRefresh || cacheBuster) {
         signalsUrl.searchParams.set('t', (cacheBuster || Date.now()).toString());
       }
@@ -500,6 +662,19 @@
     elements.statusSource.textContent = isLive ? t('pillLive') : t('pillDemo');
   }
 
+  function updateFallbackBanner(state) {
+    if (!elements.fallbackBanner || !elements.fallbackMessage) return;
+    const shouldShow = Boolean(state && state.source === 'demo' && state.fallbackReason);
+    if (!shouldShow) {
+      elements.fallbackBanner.hidden = true;
+      elements.fallbackMessage.textContent = '';
+      return;
+    }
+
+    elements.fallbackMessage.textContent = t('demoFallbackMessage', { error: state.fallbackReason });
+    elements.fallbackBanner.hidden = false;
+  }
+
   function showError(profile, error) {
     const message = error instanceof Error ? error.message : String(error);
     setStatus(t('statusErrorProfile', { profile: profile.title }), 'error', source === 'live' ? t('pillLive') : t('pillDemo'));
@@ -516,7 +691,9 @@
     setStatus(manifestMissing ? message : t('statusIdle'), manifestMissing ? 'error' : 'info', manifestMissing ? '-' : source === 'live' ? t('pillLive') : t('pillDemo'));
     const commandGenerate = t('instructionGenerateAll');
     const commandServe = t('instructionRunCommandRoot');
-    elements.errorMessage.textContent = `${message} ${commandGenerate} ${commandServe}`;
+    const reason = manifestState.fallbackReason || manifestState.errorMessage || '';
+    const reasonText = reason ? ` ${reason}` : '';
+    elements.errorMessage.textContent = `${message}${reasonText} ${commandGenerate} ${commandServe}`;
     elements.errorPanel.hidden = false;
     toggleCard(elements.currentCard, false);
     toggleCard(elements.historyCard, false);
@@ -656,7 +833,7 @@
   }
 
   function t(key, params = {}) {
-    const template = translations[key] || fallbackTranslations[key] || key;
+    const template = translations[key] ?? fallbackTranslations[key] ?? '';
     return Object.keys(params).reduce((text, name) => text.replace(`{${name}}`, params[name]), template);
   }
 })();

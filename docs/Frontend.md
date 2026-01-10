@@ -3,10 +3,18 @@
 Static, dependency-free viewer for Global Equities Momentum signals. It runs from `src/Frontend/Gem.Frontend/`, switches between profiles discovered in `dist/gem/profiles.json`, and loads each profile's `signals.json` as listed in the manifest.
 
 ## Data resolution
-- Live manifest: `dist/gem/profiles.json` (served from repo root). Signals are resolved relative to that manifest entry (`signalsPath`). No manual copying is needed. Data loads automatically on page load.
-- Demo fallback: when the live manifest is missing, the frontend falls back to `src/Frontend/Gem.Frontend/demo/profiles.json` and shows clearly labeled demo data (DEMO badge).
+- Live manifest: resolved as `dist/gem/profiles.json` relative to the current page location (works at `/` locally and `/<repo>/` on GitHub Pages). Signals are resolved from that manifest's directory, so `eu.signals.json` becomes `.../dist/gem/eu.signals.json`.
+- Demo fallback: if the live manifest fetch fails (404/network), a warning banner explains the issue and the page uses `src/Frontend/Gem.Frontend/demo/profiles.json` with the DEMO badge. "Refresh view" retries LIVE.
 - The selected profile is persisted via `?profile=` in the URL and `localStorage`.
 - Freshness: the status line shows LIVE/DEMO badge, "Generated" from the signals file (Last-Modified when available), and "Loaded" for the local fetch time. "Refresh view" re-fetches manifest and signals with cache-busting; CLI commands are needed to regenerate data.
+- Pages verification: open the deployed `/app.js` on GitHub Pages and confirm `LIVE_MANIFEST_PATH` has no leading slash.
+
+## Quick usage
+- LIVE locally: generate data (`dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update`), then from repo root run `python -m http.server 8000` and open `http://localhost:8000/` (or `http://localhost:8000/src/Frontend/Gem.Frontend/`).
+- DEMO locally without stopping the server: open `http://localhost:8000/?source=demo` (repo-root server) or serve only the frontend folder and open `http://localhost:8000/?source=demo`.
+- Source switch: `?source=auto` (default, tries LIVE then DEMO), `?source=live` (LIVE only), `?source=demo` (DEMO only).
+- DEMO on GitHub Pages: append `?source=demo` to the project URL.
+- Suspect stale assets: hard-refresh or open in incognito to clear cached JS/CSS.
 
 ## Generate signals
 - All profiles (offline): `dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update`
