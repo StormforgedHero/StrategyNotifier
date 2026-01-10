@@ -1,0 +1,18 @@
+{
+  "windowMonths": 12,
+  "rankingMode": "Top1",
+  "instruments": {
+    "usEquity": { "ticker": "ETFBW20TR.PL", "name": "WIG20TR", "sourceSymbol": "etfbw20tr.pl" },
+    "exUsEquity": { "ticker": "ETFBM40TR.PL", "name": "mWIG40TR", "sourceSymbol": "etfbm40tr.pl" },
+    "safeAsset": { "ticker": "ETFBCASH.PL", "name": "ETF Obligacji 6M", "sourceSymbol": "etfbcash.pl" }
+  },
+  "storeDirectory": "data/gem/sample",
+  "cacheDirectory": "data/gem/cache",
+  "outputPath": "dist/gem/pl.signals.json",
+  "update": {
+    "autoUpdateEnabled": false,
+    "maxAgeDays": 2,
+    "minMinutesBetweenAttempts": 30,
+    "saveUpdatedDataToStore": true
+  }
+}

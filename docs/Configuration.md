@@ -1,7 +1,7 @@
 # Configuration
 
 ## Config schema (final)
-- Location: `config/gem/gem.config.json`, resolved relative to the current working directory. Unknown fields (including casing variants) fail fast before any work starts.
+- Applies to any GEM config file. Default sample: `config/gem/gem.config.json`; batch profiles live under `config/gem/profiles/*.profile.json`. Unknown fields (including casing variants) fail fast before any work starts. Profile conventions: see [Profiles](Profiles.md).
 - `windowMonths` (int, >0, default 12): momentum lookback window in months.
 - `rankingMode` (`Top1` or `Top2`, default `Top1`): allocation rule for risk-on instruments.
 - `instruments` (object, required):

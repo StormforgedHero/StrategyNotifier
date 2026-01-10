@@ -4,6 +4,7 @@
 - Path: `outputPath` from config (default: `dist/gem/signals.json`).
 - Encoding: UTF-8 without BOM, indented JSON, with a trailing newline.
 - Ordering: signals are written newest-first (descending by `date`/as-of date).
+- The contract applies to each generated signals file (one per config/profile). In batch/profile runs, a manifest `dist/gem/profiles.json` is also produced for the frontend; the manifest is not part of the signals contract.
 
 ## Fields (high level)
 - `date` (`yyyy-MM-dd`): as-of date used for momentum calculations.

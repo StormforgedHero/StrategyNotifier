@@ -11,6 +11,15 @@ StrategyNotifier runs quantitative strategies; the current implementation focuse
   `dotnet run --project src/Strategies/Gem/Gem.Cli -- --force-update`
 - Configuration is loaded from `config/gem/gem.config.json` (relative to the working directory). Paths can be relative; the store directory must already exist.
 
+## Profiles and frontend (Phase 5)
+- Profiles live under `config/gem/profiles/*.profile.json`.
+- Default run (all profiles):  
+  `dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update`  
+  → generates per-profile outputs and `dist/gem/profiles.json` for the frontend.
+- Single profile: `dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update --profile=us`
+- Escape hatch (single config): `dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update --config=config/gem/gem.config.json`
+- Frontend (static, no build): serve repo root (`python -m http.server 8000`) and open `http://localhost:8000/`. Docs: [Frontend](docs/Frontend.md), [Profiles](docs/Profiles.md).
+
 ## Offline-first data flow
 - **Store vs cache:** Strategy calculations read only from `storeDirectory`. Updates download into `cacheDirectory` and optionally promote into the store (`update.saveUpdatedDataToStore=true`).
 - **Update modes:** `--no-update` skips any HTTP; `--force-update` always tries to refresh; no flag uses `update.autoUpdateEnabled` plus throttling (`minMinutesBetweenAttempts`).

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 namespace Gem.Cli.Tests;
 
 public sealed class GoldenJsonFixturesEncodingTests

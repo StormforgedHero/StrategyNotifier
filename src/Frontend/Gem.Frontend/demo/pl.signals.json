@@ -1,0 +1,17 @@
+[
+  {
+    "date": "2024-03-29",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "ETFBW20TR.PL",
+        "name": "W20",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "ETFBW20TR.PL return 20.00 % => risk-on"
+  }
+]

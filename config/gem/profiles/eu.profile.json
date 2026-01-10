@@ -1,0 +1,18 @@
+{
+  "windowMonths": 12,
+  "rankingMode": "Top1",
+  "instruments": {
+    "usEquity": { "ticker": "SPPW.DE", "name": "SPDR MSCI World UCITS ETF", "sourceSymbol": "sppw.de" },
+    "exUsEquity": { "ticker": "IS3N.DE", "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF", "sourceSymbol": "is3n.de" },
+    "safeAsset": { "ticker": "EUNA.DE", "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc", "sourceSymbol": "euna.de" }
+  },
+  "storeDirectory": "data/gem/sample",
+  "cacheDirectory": "data/gem/cache",
+  "outputPath": "dist/gem/eu.signals.json",
+  "update": {
+    "autoUpdateEnabled": false,
+    "maxAgeDays": 2,
+    "minMinutesBetweenAttempts": 30,
+    "saveUpdatedDataToStore": true
+  }
+}

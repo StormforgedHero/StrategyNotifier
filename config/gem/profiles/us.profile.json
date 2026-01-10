@@ -1,0 +1,18 @@
+{
+  "windowMonths": 12,
+  "rankingMode": "Top1",
+  "instruments": {
+    "usEquity": { "ticker": "VOO.US", "name": "US Equity", "sourceSymbol": "voo.us" },
+    "exUsEquity": { "ticker": "VEU.US", "name": "Ex-US Equity", "sourceSymbol": "veu.us" },
+    "safeAsset": { "ticker": "AGG.US", "name": "Bonds", "sourceSymbol": "agg.us" }
+  },
+  "storeDirectory": "data/gem/sample",
+  "cacheDirectory": "data/gem/cache",
+  "outputPath": "dist/gem/us.signals.json",
+  "update": {
+    "autoUpdateEnabled": false,
+    "maxAgeDays": 2,
+    "minMinutesBetweenAttempts": 30,
+    "saveUpdatedDataToStore": true
+  }
+}

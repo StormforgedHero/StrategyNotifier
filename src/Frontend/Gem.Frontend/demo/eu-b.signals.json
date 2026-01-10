@@ -1,0 +1,32 @@
+[
+  {
+    "date": "2024-04-30",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPPW",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 20.00 % => risk-on"
+  },
+  {
+    "date": "2024-03-28",
+    "windowMonths": 2,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPPW",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 20.00 % => risk-on"
+  }
+]
