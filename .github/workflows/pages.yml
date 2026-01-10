@@ -1,0 +1,78 @@
+name: Publish GitHub Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 17 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          dotnet-quality: 'ga'
+
+      - name: Run tests
+        run: dotnet test
+
+      - name: Run GEM CLI (generate outputs)
+        run: dotnet run --project src/Strategies/Gem/Gem.Cli -- --force-update
+
+      - name: Assemble site content
+        run: |
+          publish_dir="dist/site"
+          rm -rf "$publish_dir"
+          mkdir -p "$publish_dir"
+
+          cp src/Frontend/Gem.Frontend/index.html "$publish_dir/"
+          cp src/Frontend/Gem.Frontend/app.js "$publish_dir/"
+          cp src/Frontend/Gem.Frontend/styles.css "$publish_dir/"
+          cp -r src/Frontend/Gem.Frontend/i18n "$publish_dir/"
+          cp -r src/Frontend/Gem.Frontend/demo "$publish_dir/"
+          mkdir -p "$publish_dir/dist"
+          cp -r dist/gem "$publish_dir/dist/"
+
+          touch "$publish_dir/.nojekyll"
+
+      - name: List publish directory
+        run: |
+          echo "Trigger: ${{ github.event_name }}"
+          echo "Cron: 0 17 * * * (runs after local market close)"
+          echo "Pages root; data served from dist/gem/profiles.json"
+          ls -R dist/site
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist/site
+          publish_branch: gh-pages
+          force_orphan: true
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          {
+            echo "### GitHub Pages deploy"
+            echo ""
+            echo "- Trigger: ${{ github.event_name }}"
+            echo "- Schedule (cron): 0 17 * * *"
+            echo "- Publish branch: gh-pages"
+            echo "- UI path: /"
+            echo "- Data path: /dist/gem/profiles.json"
+          } >> "$GITHUB_STEP_SUMMARY"
