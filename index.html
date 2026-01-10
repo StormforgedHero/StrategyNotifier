@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=/src/Frontend/Gem.Frontend/">
-  <base href="/src/Frontend/Gem.Frontend/">
+  <script>
+    (function redirect() {
+      var target = "src/Frontend/Gem.Frontend/" + window.location.search + window.location.hash;
+      window.location.replace(target);
+    })();
+  </script>
 </head>
 <body></body>
 </html>

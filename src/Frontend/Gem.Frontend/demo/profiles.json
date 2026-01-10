@@ -11,7 +11,7 @@
     {
       "id": "eu",
       "title": "EU demo",
-      "signalsPath": "eu-b.signals.json",
+      "signalsPath": "eu.signals.json",
       "windowMonths": 2,
       "lastSignalDate": "2024-04-30",
       "isRiskOn": true

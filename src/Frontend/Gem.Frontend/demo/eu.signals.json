@@ -6,7 +6,7 @@
     "allocations": [
       {
         "ticker": "SPPW.DE",
-        "name": "SPPW",
+        "name": "SPDR MSCI World UCITS ETF",
         "weight": 1
       }
     ],
@@ -21,7 +21,7 @@
     "allocations": [
       {
         "ticker": "SPPW.DE",
-        "name": "SPPW",
+        "name": "SPDR MSCI World UCITS ETF",
         "weight": 1
       }
     ],

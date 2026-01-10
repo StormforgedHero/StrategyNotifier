@@ -12,9 +12,9 @@
   "statusManifestMissing": "Brak manifestu. Wygeneruj sygnały i serwuj katalog repozytorium, aby utworzyć dist/gem/profiles.json.",
   "instructionGenerateAll": "Wygeneruj sygnały: dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update.",
   "instructionRunCommandRoot": "Serwuj katalog repozytorium: python -m http.server 8000 (z katalogu repo), a potem otwórz http://localhost:8000/.",
-  "demoFallbackMessage": "Dane LIVE niedostępne ({error}). Pokazujemy dane demo. Użyj „Odśwież”, aby spróbować ponownie.",
-  "liveOnlyError": "Tryb LIVE nie działa: {error}. Fallback do DEMO wyłączony.",
-  "demoUnavailable": "Brak danych DEMO ({error}).",
+  "demoFallbackMessage": "Dane Live niedostępne ({error}). Pokazujemy dane Demo. Użyj „Odśwież”, aby spróbować ponownie.",
+  "liveOnlyError": "Tryb Live nie działa: {error}. Fallback do Demo wyłączony.",
+  "demoUnavailable": "Brak danych Demo ({error}).",
   "unavailable": "Niedostępne",
   "refreshButton": "Odśwież widok",
   "refreshCommandLabel": "Polecenie do odświeżenia tego profilu",
@@ -50,7 +50,7 @@
   "showMore": "Pokaż więcej",
   "showLess": "Pokaż mniej",
   "orderWarning": "Sygnały powinny być posortowane od najnowszych; dwa pierwsze wpisy nie są malejące.",
-  "pillLive": "Dane LIVE",
-  "pillDemo": "Dane demo",
+  "pillLive": "Live",
+  "pillDemo": "Demo",
   "errorInvalidFormat": "Nieprawidłowy format: oczekiwano tablicy sygnałów."
 }
