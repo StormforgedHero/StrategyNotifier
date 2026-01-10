@@ -47,6 +47,19 @@ jobs:
           mkdir -p "$publish_dir/dist"
           cp -r dist/gem "$publish_dir/dist/"
 
+          export PUBLISH_DIR="$publish_dir"
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+
+          version = os.environ.get("GITHUB_SHA", "local")
+          index = Path(os.environ["PUBLISH_DIR"]) / "index.html"
+          text = index.read_text(encoding="utf-8")
+          text = re.sub(r"(app\\.js)(\\?v=[^\"\\s>]*)?", f"app.js?v={version}", text)
+          text = re.sub(r"(styles\\.css)(\\?v=[^\"\\s>]*)?", f"styles.css?v={version}", text)
+          index.write_text(text, encoding="utf-8")
+          PY
+
           touch "$publish_dir/.nojekyll"
 
       - name: List publish directory
