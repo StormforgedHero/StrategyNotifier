@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>GEM Signals</title>
   <link rel="stylesheet" href="./styles.css">
+  <script src="./site-config.js"></script>
 </head>
 <body>
   <div class="page">
@@ -55,7 +56,7 @@
       <div class="card-header">
         <div>
           <p class="eyebrow" id="current-profile-label"></p>
-          <h2 data-i18n="currentSignal">Current signal</h2>
+      <h2 data-i18n="currentSignal">Current signal</h2>
         </div>
         <div class="current-meta">
           <span id="mode-chip" class="pill muted">-</span>
@@ -64,10 +65,6 @@
       </div>
       <div class="current-grid" id="current-content"></div>
       <div id="comment-container"></div>
-      <div class="command-row">
-        <div class="label" data-i18n="refreshCommandLabel">Command to refresh this profile</div>
-        <div id="command-text" class="command-text">-</div>
-      </div>
     </section>
 
     <section class="card" id="history-card" hidden>
@@ -113,6 +110,10 @@
         </ul>
       </div>
     </section>
+    <footer class="footer">
+      <a data-footer="privacy-link" href="./privacy.html">Privacy Policy</a>
+      <a data-footer="subscribe-link" href="#" hidden>Subscribe</a>
+    </footer>
   </div>
   <script src="./app.js"></script>
 </body>

@@ -82,7 +82,8 @@ p {
   box-shadow: 0 0 0 6px rgba(124, 231, 180, 0.1);
 }
 
-.topbar-actions select {
+.topbar-actions select,
+.lang-select {
   background: var(--panel);
   color: var(--text);
   border-radius: 10px;
@@ -422,6 +423,24 @@ tbody tr:nth-child(odd) {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+.footer {
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.footer a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 @media (min-width: 720px) {

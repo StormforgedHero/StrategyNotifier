@@ -1,14 +1,11 @@
-# StrategyNotifier – GEM (Global Equities Momentum)
+# StrategyNotifier - GEM (Global Equities Momentum)
 
 StrategyNotifier runs quantitative strategies; the current implementation focuses on a daily-price, thesis-aligned GEM. The CLI is offline-first: calculations read from a local store, updates are optional and isolated, and tests never require network access.
 
 ## Quickstart
 - Prerequisite: .NET 10 SDK.
 - Run tests: `dotnet test`
-- Run GEM without touching the network (recommended for CI/tests):  
-  `dotnet run --project src/Strategies/Gem/Gem.Cli -- --no-update`
-- Run GEM with a manual refresh attempt (not for CI/tests; may hit the network):  
-  `dotnet run --project src/Strategies/Gem/Gem.Cli -- --force-update`
+- Local runs and profile refresh commands: see [Local run](docs/Local-Run.md).
 - Configuration is loaded from `config/gem/gem.config.json` (relative to the working directory). Paths can be relative; the store directory must already exist.
 
 ## Profiles and frontend (Phase 5)
@@ -67,3 +64,6 @@ Full mapping: [Thesis mapping](docs/Thesis-Mapping.md).
 - Automate publishing (Pages/CI) for docs and artifacts.
 - Optional notifications (e.g., Apps Script) consuming `signals.json`.
 - Additional strategies alongside GEM while reusing the offline-first pipeline.
+
+## Apps Script notifier
+- The Google Apps Script subscriber notifier and privacy policy are documented in [Apps Script](docs/Apps-Script.md) and [Privacy policy](docs/Privacy-Policy.md).

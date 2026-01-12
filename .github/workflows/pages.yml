@@ -42,6 +42,8 @@ jobs:
           cp src/Frontend/Gem.Frontend/index.html "$publish_dir/"
           cp src/Frontend/Gem.Frontend/app.js "$publish_dir/"
           cp src/Frontend/Gem.Frontend/styles.css "$publish_dir/"
+          cp src/Frontend/Gem.Frontend/privacy.html "$publish_dir/"
+          cp src/Frontend/Gem.Frontend/site-config.js "$publish_dir/"
           cp -r src/Frontend/Gem.Frontend/i18n "$publish_dir/"
           cp -r src/Frontend/Gem.Frontend/demo "$publish_dir/"
           mkdir -p "$publish_dir/dist"
