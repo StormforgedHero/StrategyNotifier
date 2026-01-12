@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Privacy Policy - Strategy Notifier</title>
+  <title>GEM Signals - Privacy Policy</title>
   <link rel="stylesheet" href="./styles.css">
   <style>
     .privacy-page {
@@ -44,8 +44,11 @@
       <div class="brand">
         <div class="dot" aria-hidden="true"></div>
         <div>
-          <p class="eyebrow">Strategy Notifier</p>
-          <h1>Privacy</h1>
+          <p class="eyebrow">GEM</p>
+          <h1>
+            <span data-lang="en">GEM Signals</span>
+            <span data-lang="pl" class="hidden">Sygnały GEM</span>
+          </h1>
         </div>
       </div>
       <div class="topbar-actions">
@@ -78,7 +81,7 @@
       <p>No data is shared with third parties beyond the infrastructure used to deliver the service (Google Sheets/Apps Script for automation and GitHub Pages for hosting this static site).</p>
 
       <h2>Links</h2>
-      <p><a id="back-link-en" href="./index.html">Back to the main page</a></p>
+      <p><a id="back-link-en" href="./?lang=en">Back to the main page</a></p>
     </div>
 
     <div data-lang="pl" class="hidden">
@@ -102,7 +105,7 @@
       <p>Brak udostępniania osobom trzecim poza infrastrukturą niezbędną do świadczenia usługi (Google Sheets/Apps Script do automatyzacji oraz GitHub Pages do hostingu tej statycznej strony).</p>
 
       <h2>Linki</h2>
-      <p><a id="back-link-pl" href="./index.html">Powrót na stronę główną</a></p>
+      <p><a id="back-link-pl" href="./?lang=pl">Powrót na stronę główną</a></p>
     </div>
   </div>
 
@@ -153,8 +156,12 @@
 
         var backEn = document.getElementById('back-link-en');
         var backPl = document.getElementById('back-link-pl');
-        if (backEn) backEn.href = './index.html?lang=' + encodeURIComponent(lang);
-        if (backPl) backPl.href = './index.html?lang=' + encodeURIComponent(lang);
+        if (backEn) backEn.href = './?lang=' + encodeURIComponent(lang);
+        if (backPl) backPl.href = './?lang=' + encodeURIComponent(lang);
+
+        document.title = lang === 'pl'
+          ? 'Sygnały GEM - Polityka prywatności'
+          : 'GEM Signals - Privacy Policy';
       }
 
       var initialLang = detectLang();

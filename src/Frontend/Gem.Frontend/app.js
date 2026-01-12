@@ -100,46 +100,112 @@
     return ensureTrailingSlash(parts[0]);
   }
 
+  function canonicalizeUrlForPages(url) {
+    const next = new URL(url.toString());
+    if (next.pathname.endsWith('/index.html')) {
+      next.pathname = next.pathname.replace(/index\.html$/, '');
+    }
+    const parts = next.pathname.split('/').filter(Boolean);
+    const last = parts[parts.length - 1] || '';
+    const isFile = last.includes('.');
+    if (!isFile && !next.pathname.endsWith('/')) {
+      next.pathname = `${next.pathname}/`;
+    }
+    if (!next.pathname) {
+      next.pathname = '/';
+    }
+    return next;
+  }
+
+  function ensureCriticalElements() {
+    const requiredIds = [
+      'status-text',
+      'status-line',
+      'error-panel',
+      'error-message',
+      'profile-select',
+      'language-select',
+      'refresh-button',
+      'freshness-generated',
+      'freshness-loaded'
+    ];
+    const missing = requiredIds.filter((id) => !document.getElementById(id));
+    if (missing.length === 0) return true;
+
+    const flagKey = 'sn_selfheal_attempted';
+    const attempted = window.sessionStorage.getItem(flagKey);
+    if (!attempted) {
+      window.sessionStorage.setItem(flagKey, '1');
+      const busted = canonicalizeUrlForPages(new URL(window.location.href));
+      busted.searchParams.set('r', Date.now().toString());
+      window.location.replace(busted.toString());
+    } else {
+      console.error('Self-heal: missing required elements', missing);
+      const statusText = document.getElementById('status-text');
+      const statusLine = document.getElementById('status-line');
+      const errorPanel = document.getElementById('error-panel');
+      const errorMessage = document.getElementById('error-message');
+      if (statusText && statusLine) {
+        statusText.textContent = 'Please refresh the page.';
+        statusLine.className = 'status-line error';
+      }
+      if (errorPanel && errorMessage) {
+        errorMessage.textContent = 'Page is out of date. Refresh to continue.';
+        errorPanel.hidden = false;
+      }
+    }
+    return false;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     bootstrap().catch((err) => showFatalError(err instanceof Error ? err.message : String(err)));
   });
 
   async function bootstrap() {
+    if (!ensureCriticalElements()) return;
     resolvePreferencesFromUrl();
     await setupLanguage();
     applyStaticTranslations();
     clearFreshness();
     await loadAndRender();
 
-    elements.refreshButton.addEventListener('click', async () => {
-      cacheBuster = Date.now();
-      await loadAndRender(true);
-    });
+    if (elements.refreshButton) {
+      elements.refreshButton.addEventListener('click', async () => {
+        cacheBuster = Date.now();
+        await loadAndRender(true);
+      });
+    }
 
-    elements.historyToggle.addEventListener('click', () => {
-      if (!lastSignals) return;
-      showAllHistory = !showAllHistory;
-      renderHistory(lastSignals);
-    });
+    if (elements.historyToggle) {
+      elements.historyToggle.addEventListener('click', () => {
+        if (!lastSignals) return;
+        showAllHistory = !showAllHistory;
+        renderHistory(lastSignals);
+      });
+    }
   }
 
   async function setupLanguage() {
     const preferred = resolveLanguage();
     await loadTranslations(preferred);
     currentLang = preferred;
-    elements.languageSelect.value = currentLang;
+    if (elements.languageSelect) {
+      elements.languageSelect.value = currentLang;
+    }
     applyFooterLanguage(currentLang);
 
-    elements.languageSelect.addEventListener('change', async (event) => {
-      const lang = event.target.value;
-      await loadTranslations(lang);
-      currentLang = lang;
-      persistLanguage(lang);
-      applyFooterLanguage(lang);
-      applyStaticTranslations();
-      updateFallbackBanner(manifestState);
-      rerenderFromCache();
-    });
+    if (elements.languageSelect) {
+      elements.languageSelect.addEventListener('change', async (event) => {
+        const lang = event.target.value;
+        await loadTranslations(lang);
+        currentLang = lang;
+        persistLanguage(lang);
+        applyFooterLanguage(lang);
+        applyStaticTranslations();
+        updateFallbackBanner(manifestState);
+        rerenderFromCache();
+      });
+    }
   }
 
   async function loadTranslations(lang) {
@@ -270,20 +336,26 @@
     updateFallbackBanner(manifestState);
 
     setupProfileOptions(profiles);
-    const initialProfileId = currentProfileId && profiles.some((p) => p.id === currentProfileId)
+    const initialProfileId = currentProfileId && profiles.some((p) => p?.id === currentProfileId)
       ? currentProfileId
       : getInitialProfileId(profiles);
-    elements.profileSelect.value = initialProfileId;
 
-    elements.profileSelect.onchange = async (event) => {
-      const selectedId = (event.target.value || '').trim();
-      if (!selectedId) return;
-      showAllHistory = false;
-      await loadProfile(selectedId, forceRefresh);
-    };
+    if (elements.profileSelect) {
+      elements.profileSelect.value = initialProfileId || '';
+      elements.profileSelect.onchange = async (event) => {
+        const selectedId = (event.target.value || '').trim();
+        if (!selectedId) return;
+        showAllHistory = false;
+        await loadProfile(selectedId, forceRefresh);
+      };
+    }
 
     showAllHistory = false;
-    await loadProfile(initialProfileId, forceRefresh);
+    if (initialProfileId) {
+      await loadProfile(initialProfileId, forceRefresh);
+    } else {
+      showInstruction(t('statusManifestMissing'), true);
+    }
   }
 
   function buildManifestUrl(relativePath, forceRefresh, baseOverride) {
@@ -423,7 +495,8 @@
     updateUrl(profile.id);
 
     hideError();
-    setStatus(t('statusLoadingProfile', { profile: profile.title }), 'loading', source === 'live' ? t('pillLive') : t('pillDemo'));
+    const profileLabel = profile?.title || profile?.id || '-';
+    setStatus(t('statusLoadingProfile', { profile: profileLabel }), 'loading', source === 'live' ? t('pillLive') : t('pillDemo'));
     updateSourcePill(source === 'live');
     toggleCard(elements.currentCard, false);
     toggleCard(elements.historyCard, false);
@@ -431,7 +504,7 @@
 
     try {
       const manifestBaseUrl = new URL('.', manifestUrl);
-      const signalsUrl = new URL(profile.signalsPath, manifestBaseUrl);
+      const signalsUrl = resolveSignalsUrl(profile, manifestBaseUrl);
       if (forceRefresh || cacheBuster) {
         signalsUrl.searchParams.set('t', (cacheBuster || Date.now()).toString());
       }
@@ -463,24 +536,26 @@
   }
 
   function resolveProfile(profileId) {
-    const normalized = profileId?.trim().toLowerCase();
-    const found = profiles.find((p) => p.id.toLowerCase() === normalized);
-    return found ?? profiles[0];
+    const safeProfiles = (profiles || []).filter((p) => p && p.id);
+    const normalized = profileId ? profileId.trim().toLowerCase() : '';
+    const found = safeProfiles.find((p) => (p.id || '').toLowerCase() === normalized);
+    return found ?? safeProfiles[0] ?? { id: '', title: '', signalsPath: '' };
   }
 
   function getInitialProfileId(list) {
+    const safeList = (list || []).filter((p) => p && p.id);
     const search = new URLSearchParams(window.location.search);
     const fromQuery = search.get('profile');
     const fromStorage = window.localStorage.getItem(LOCAL_STORAGE_KEY);
 
-    const candidates = [fromQuery, fromStorage, list[0]?.id];
+    const candidates = [fromQuery, fromStorage, safeList[0]?.id];
     for (const candidate of candidates) {
       if (!candidate) continue;
-      const match = list.find((p) => p.id.toLowerCase() === candidate.toLowerCase());
+      const match = safeList.find((p) => (p.id || '').toLowerCase() === candidate.toLowerCase());
       if (match) return match.id;
     }
 
-    return list[0].id;
+    return safeList[0]?.id || '';
   }
 
   async function fetchSignals(url) {
@@ -520,8 +595,12 @@
   }
 
   function renderCurrent(profile, signal) {
+    if (!elements.currentCard || !elements.currentContent || !elements.modeChip || !elements.currentDate || !elements.commentContainer || !elements.currentProfileLabel) {
+      return;
+    }
+
     toggleCard(elements.currentCard, true);
-    elements.currentProfileLabel.textContent = profile.title;
+    elements.currentProfileLabel.textContent = profile.title || profile.id || '';
     elements.modeChip.textContent = signal.isRiskOn ? t('modeRiskOn') : t('modeRiskOff');
     elements.modeChip.className = `pill ${signal.isRiskOn ? 'live' : 'off'}`;
     elements.currentDate.textContent = signal.date ? t('signalFor', { date: signal.date }) : '';
@@ -612,6 +691,10 @@
   }
 
   function renderHistory(signals) {
+    if (!elements.historyCard || !elements.historyBody || !elements.historyCount || !elements.historyToggle) {
+      return;
+    }
+
     toggleCard(elements.historyCard, true);
     const visible = showAllHistory ? signals : signals.slice(0, HISTORY_DEFAULT_COUNT);
     elements.historyBody.innerHTML = '';
@@ -659,6 +742,7 @@
   }
 
   function showWarning(message, visible) {
+    if (!elements.orderWarning) return;
     if (!visible) {
       elements.orderWarning.hidden = true;
       elements.orderWarning.textContent = '';
@@ -670,15 +754,17 @@
   }
 
   function setStatus(message, state, sourceLabel) {
+    if (!elements.statusText || !elements.statusLine) return;
     elements.statusText.textContent = message;
     elements.statusLine.className = `status-line ${state ?? ''}`;
-    if (sourceLabel !== undefined) {
+    if (sourceLabel !== undefined && elements.statusSource) {
       elements.statusSource.textContent = sourceLabel;
       elements.statusSource.className = 'pill';
     }
   }
 
   function updateSourcePill(isLive) {
+    if (!elements.statusSource) return;
     elements.statusSource.className = `pill ${isLive ? 'live' : 'demo'}`;
     elements.statusSource.textContent = isLive ? t('pillLive') : t('pillDemo');
   }
@@ -697,11 +783,12 @@
   }
 
   function showError(profile, error) {
+    const profileLabel = profile?.title || profile?.id || '';
     const message = error instanceof Error ? error.message : String(error);
-    setStatus(t('statusErrorProfile', { profile: profile.title }), 'error', source === 'live' ? t('pillLive') : t('pillDemo'));
+    setStatus(t('statusErrorProfile', { profile: profileLabel }), 'error', source === 'live' ? t('pillLive') : t('pillDemo'));
     updateSourcePill(source === 'live');
-    elements.errorMessage.textContent = message;
-    elements.errorPanel.hidden = false;
+    if (elements.errorMessage) elements.errorMessage.textContent = message;
+    if (elements.errorPanel) elements.errorPanel.hidden = false;
     toggleCard(elements.currentCard, false);
     toggleCard(elements.historyCard, false);
     lastError = error;
@@ -710,10 +797,10 @@
 
   function showInstruction(message, manifestMissing) {
     setStatus(manifestMissing ? message : t('statusIdle'), manifestMissing ? 'error' : 'info', manifestMissing ? '-' : source === 'live' ? t('pillLive') : t('pillDemo'));
-        const reason = manifestState.fallbackReason || manifestState.errorMessage || '';
+    const reason = manifestState.fallbackReason || manifestState.errorMessage || '';
     const reasonText = reason ? ` ${reason}` : '';
-    elements.errorMessage.textContent = `${message}${reasonText} ${t('manifestHelp')}`;
-    elements.errorPanel.hidden = false;
+    if (elements.errorMessage) elements.errorMessage.textContent = `${message}${reasonText} ${t('manifestHelp')}`;
+    if (elements.errorPanel) elements.errorPanel.hidden = false;
     toggleCard(elements.currentCard, false);
     toggleCard(elements.historyCard, false);
     clearFreshness();
@@ -721,16 +808,16 @@
 
   function showFatalError(message) {
     setStatus(t('fatalError'), 'error', '-');
-    elements.errorMessage.textContent = message;
-    elements.errorPanel.hidden = false;
+    if (elements.errorMessage) elements.errorMessage.textContent = message;
+    if (elements.errorPanel) elements.errorPanel.hidden = false;
     toggleCard(elements.currentCard, false);
     toggleCard(elements.historyCard, false);
     clearFreshness();
   }
 
   function hideError() {
-    elements.errorPanel.hidden = true;
-    elements.errorMessage.textContent = '';
+    if (elements.errorPanel) elements.errorPanel.hidden = true;
+    if (elements.errorMessage) elements.errorMessage.textContent = '';
   }
 
   function createStat(label, value) {
@@ -808,10 +895,12 @@
   }
 
   function toggleCard(card, visible) {
+    if (!card) return;
     card.hidden = !visible;
   }
 
   function setFreshness(profile, signalsMeta = {}) {
+    if (!elements.freshness || !elements.freshnessGenerated || !elements.freshnessLoaded) return;
     const generated = signalsMeta.signalsLastModified || manifestState.lastModified;
     const loaded = signalsMeta.loadedAt || manifestState.loadedAt;
 
@@ -828,9 +917,9 @@
   }
 
   function clearFreshness() {
-    elements.freshnessGenerated.textContent = '';
-    elements.freshnessLoaded.textContent = '';
-    elements.freshness.hidden = true;
+    if (elements.freshnessGenerated) elements.freshnessGenerated.textContent = '';
+    if (elements.freshnessLoaded) elements.freshnessLoaded.textContent = '';
+    if (elements.freshness) elements.freshness.hidden = true;
   }
 
   function persistProfile(profileId) {
@@ -843,7 +932,7 @@
   }
 
   function updateLangParam(lang) {
-    const url = new URL(window.location.href);
+    const url = canonicalizeUrlForPages(new URL(window.location.href));
     url.searchParams.set('lang', lang);
     window.history.replaceState({}, '', url);
     applyFooterLanguage(lang);
@@ -870,9 +959,22 @@
   }
 
   function updateUrl(profileId) {
-    const url = new URL(window.location.href);
+    const url = canonicalizeUrlForPages(new URL(window.location.href));
     url.searchParams.set('profile', profileId);
     window.history.replaceState({}, '', url);
+  }
+
+  function resolveSignalsUrl(profile, manifestBaseUrl) {
+    const raw = profile?.signalsPath || '';
+    if (!raw) throw new Error(t('statusNoSignals', { profile: profile?.title || profile?.id || '' }));
+    if (/^https?:\/\//i.test(raw)) {
+      return new URL(raw);
+    }
+    if (raw.startsWith('/')) {
+      const base = new URL(getRepoRootBase(), window.location.origin);
+      return new URL(raw.replace(/^\/+/, ''), base);
+    }
+    return new URL(raw, manifestBaseUrl);
   }
 
 
