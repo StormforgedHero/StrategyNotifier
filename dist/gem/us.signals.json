@@ -1,0 +1,2627 @@
+[
+  {
+    "date": "2026-03-27",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.178640776699029126213592233,
+    "relativeRank": 1,
+    "comment": "VEU.US return 17.86 % =\u003E risk-on"
+  },
+  {
+    "date": "2026-02-27",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3466096115865701119157340355,
+    "relativeRank": 1,
+    "comment": "VEU.US return 34.66 % =\u003E risk-on"
+  },
+  {
+    "date": "2026-01-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2970131820457200066744535291,
+    "relativeRank": 1,
+    "comment": "VEU.US return 29.70 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2813098763281658247692039714,
+    "relativeRank": 1,
+    "comment": "VEU.US return 28.13 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-11-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2305227655986509274873524452,
+    "relativeRank": 1,
+    "comment": "VEU.US return 23.05 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2081809112071832391087462587,
+    "relativeRank": 1,
+    "comment": "VEU.US return 20.82 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1642493065417966603737354725,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-08-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1629384451276902804793875886,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.29 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1556837394331178518150174043,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.57 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1463165075034106412005457026,
+    "relativeRank": 1,
+    "comment": "VEU.US return 14.63 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-05-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1387972169087507619868412755,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.88 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1156318463057033488215326095,
+    "relativeRank": 1,
+    "comment": "VOO.US return 11.56 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0796700757161945259124179601,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.97 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1898103986723986985325824197,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.98 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2631374697530018718896954755,
+    "relativeRank": 1,
+    "comment": "VOO.US return 26.31 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2497564550995982668880992364,
+    "relativeRank": 1,
+    "comment": "VOO.US return 24.98 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-11-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3433975220618315703348723044,
+    "relativeRank": 1,
+    "comment": "VOO.US return 34.34 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3796762413704528542715430835,
+    "relativeRank": 1,
+    "comment": "VOO.US return 37.97 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3626217905707350308669960182,
+    "relativeRank": 1,
+    "comment": "VOO.US return 36.26 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-08-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.268706485440721617724981824,
+    "relativeRank": 1,
+    "comment": "VOO.US return 26.87 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2204358369968660712768514091,
+    "relativeRank": 1,
+    "comment": "VOO.US return 22.04 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-06-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2657348712711417634669308565,
+    "relativeRank": 1,
+    "comment": "VOO.US return 26.57 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2815473567546635687484143199,
+    "relativeRank": 1,
+    "comment": "VOO.US return 28.15 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2260956602943228534933396305,
+    "relativeRank": 1,
+    "comment": "VOO.US return 22.61 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-03-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3424146022291412842380758991,
+    "relativeRank": 1,
+    "comment": "VOO.US return 34.24 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-02-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3030116258029494254953406315,
+    "relativeRank": 1,
+    "comment": "VOO.US return 30.30 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2075819141135412589108992772,
+    "relativeRank": 1,
+    "comment": "VOO.US return 20.76 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-12-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2597579433954545720179760047,
+    "relativeRank": 1,
+    "comment": "VOO.US return 25.98 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1386871797704705216202405778,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.87 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1081928136311468173391012625,
+    "relativeRank": 1,
+    "comment": "VEU.US return 10.82 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-09-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1976723621707658369040120881,
+    "relativeRank": 1,
+    "comment": "VOO.US return 19.77 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1593247202068981301352619413,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.93 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1298553475334477973000400441,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.99 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1944891205055632927504979259,
+    "relativeRank": 1,
+    "comment": "VOO.US return 19.45 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0287968040795243485619456869,
+    "relativeRank": 1,
+    "comment": "VOO.US return 2.88 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-04-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0325123899591581461020193501,
+    "relativeRank": 1,
+    "comment": "VEU.US return 3.25 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-03-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0438194290455719200864085379,
+    "relativeRank": 1,
+    "comment": "VEU.US return -4.38 % =\u003E risk-off"
+  },
+  {
+    "date": "2023-02-28",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0727114515064212641090751849,
+    "relativeRank": 1,
+    "comment": "VEU.US return -7.27 % =\u003E risk-off"
+  },
+  {
+    "date": "2023-01-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0598439513464932179385224197,
+    "relativeRank": 1,
+    "comment": "VEU.US return -5.98 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-12-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.1573293356615737807409249882,
+    "relativeRank": 1,
+    "comment": "VEU.US return -15.73 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-11-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0924052282993988558708066562,
+    "relativeRank": 1,
+    "comment": "VOO.US return -9.24 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-10-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.146074713330148112756808409,
+    "relativeRank": 1,
+    "comment": "VOO.US return -14.61 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-09-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.1545938113464862863550764592,
+    "relativeRank": 1,
+    "comment": "VOO.US return -15.46 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-08-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.1123683956586438594798295556,
+    "relativeRank": 1,
+    "comment": "VOO.US return -11.24 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-07-29",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0514720994424831483182138648,
+    "relativeRank": 1,
+    "comment": "VOO.US return -5.15 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-06-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.1057458211357725776514796434,
+    "relativeRank": 1,
+    "comment": "VOO.US return -10.57 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-05-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0031742727793099859499401572,
+    "relativeRank": 1,
+    "comment": "VOO.US return -0.32 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-04-29",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0057187774743709481722096995,
+    "relativeRank": 1,
+    "comment": "VOO.US return -0.57 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1553282222035143130020291631,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.53 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1640741212971226996472438268,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.41 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2330308201549275122684744663,
+    "relativeRank": 1,
+    "comment": "VOO.US return 23.30 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2879269776375190677050202874,
+    "relativeRank": 1,
+    "comment": "VOO.US return 28.79 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.277885450136307866773876301,
+    "relativeRank": 1,
+    "comment": "VOO.US return 27.79 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-10-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.4121913677862820756109389167,
+    "relativeRank": 1,
+    "comment": "VOO.US return 41.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3003536383882956430780740736,
+    "relativeRank": 1,
+    "comment": "VOO.US return 30.04 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3127473106271480813529037226,
+    "relativeRank": 1,
+    "comment": "VOO.US return 31.27 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-07-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3753681084171427955025151828,
+    "relativeRank": 1,
+    "comment": "VOO.US return 37.54 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.4097087451954661813678479464,
+    "relativeRank": 1,
+    "comment": "VOO.US return 40.97 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-05-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.4340750746480875870894355183,
+    "relativeRank": 1,
+    "comment": "VEU.US return 43.41 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.4607769696090987442508598539,
+    "relativeRank": 1,
+    "comment": "VOO.US return 46.08 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.5646452855384419725385282722,
+    "relativeRank": 1,
+    "comment": "VOO.US return 56.46 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-02-26",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2444597239117787062992542445,
+    "relativeRank": 1,
+    "comment": "VOO.US return 24.45 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-01-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.154185735839001573544291491,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1832065531125092253618899387,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.32 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1744515468804671304360912439,
+    "relativeRank": 1,
+    "comment": "VOO.US return 17.45 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-10-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0934245297683817814394528214,
+    "relativeRank": 1,
+    "comment": "VOO.US return 9.34 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1502464133609029446097824311,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.02 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2186161958385128492618682006,
+    "relativeRank": 1,
+    "comment": "VOO.US return 21.86 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1204645977920817001690100327,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.05 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0737614530122435741506527203,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.38 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-05-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.11600820537469208387334884,
+    "relativeRank": 1,
+    "comment": "VOO.US return 11.60 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0086362380774417886680857287,
+    "relativeRank": 1,
+    "comment": "VOO.US return 0.86 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-03-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0695660626141050780985867875,
+    "relativeRank": 1,
+    "comment": "VOO.US return -6.96 % =\u003E risk-off"
+  },
+  {
+    "date": "2020-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0831279939345900678912361719,
+    "relativeRank": 1,
+    "comment": "VOO.US return 8.31 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2168722925432081194794566851,
+    "relativeRank": 1,
+    "comment": "VOO.US return 21.69 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3137086439189221620116826579,
+    "relativeRank": 1,
+    "comment": "VOO.US return 31.37 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-11-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1705642462037134904696473241,
+    "relativeRank": 1,
+    "comment": "VOO.US return 17.06 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1433678654850846067435764849,
+    "relativeRank": 1,
+    "comment": "VOO.US return 14.34 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0423586280787870482265439097,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.24 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-08-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.028189780838968644142130962,
+    "relativeRank": 1,
+    "comment": "VOO.US return 2.82 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0790485716502979141696774249,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.90 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-06-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1041082890932041790136167089,
+    "relativeRank": 1,
+    "comment": "VOO.US return 10.41 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.037182497908062731125327287,
+    "relativeRank": 1,
+    "comment": "VOO.US return 3.72 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1342345580036675605193560575,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-03-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0940025521054870267971076138,
+    "relativeRank": 1,
+    "comment": "VOO.US return 9.40 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0468129241730738878492029492,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.68 % =\u003E risk-on"
+  },
+  {
+    "date": "2019-01-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0238817763075066314148899684,
+    "relativeRank": 1,
+    "comment": "VOO.US return -2.39 % =\u003E risk-off"
+  },
+  {
+    "date": "2018-12-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0450384793439947930274236945,
+    "relativeRank": 1,
+    "comment": "VOO.US return -4.50 % =\u003E risk-off"
+  },
+  {
+    "date": "2018-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0610637053268832579689690712,
+    "relativeRank": 1,
+    "comment": "VOO.US return 6.11 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0733845307304002488097801383,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.34 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-09-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1832275246668501120327056881,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.32 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1961231983613518846951265206,
+    "relativeRank": 1,
+    "comment": "VOO.US return 19.61 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1621647351200765603940254834,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-06-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.147325064933068990425253969,
+    "relativeRank": 1,
+    "comment": "VOO.US return 14.73 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1437907151457769453220677377,
+    "relativeRank": 1,
+    "comment": "VOO.US return 14.38 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1516004554655870445344129555,
+    "relativeRank": 1,
+    "comment": "VEU.US return 15.16 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-03-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1605303912091380772948766004,
+    "relativeRank": 1,
+    "comment": "VEU.US return 16.05 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2092465762186307944605481632,
+    "relativeRank": 1,
+    "comment": "VEU.US return 20.92 % =\u003E risk-on"
+  },
+  {
+    "date": "2018-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2930876363975502844530108496,
+    "relativeRank": 1,
+    "comment": "VEU.US return 29.31 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-12-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2745891904731057416164626115,
+    "relativeRank": 1,
+    "comment": "VEU.US return 27.46 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2726772695145663108854743917,
+    "relativeRank": 1,
+    "comment": "VEU.US return 27.27 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2377125076712712238503859861,
+    "relativeRank": 1,
+    "comment": "VEU.US return 23.77 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-09-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.200681992418757187273733975,
+    "relativeRank": 1,
+    "comment": "VEU.US return 20.07 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1902147329947055819828536107,
+    "relativeRank": 1,
+    "comment": "VEU.US return 19.02 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1908988569449255282299965362,
+    "relativeRank": 1,
+    "comment": "VEU.US return 19.09 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2009275663232489646689761789,
+    "relativeRank": 1,
+    "comment": "VEU.US return 20.09 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1860521776144815843713594408,
+    "relativeRank": 1,
+    "comment": "VEU.US return 18.61 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-04-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1722218484105186535438368985,
+    "relativeRank": 1,
+    "comment": "VOO.US return 17.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.171054906513201768468891249,
+    "relativeRank": 1,
+    "comment": "VOO.US return 17.11 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2389689049357037269599570922,
+    "relativeRank": 1,
+    "comment": "VOO.US return 23.90 % =\u003E risk-on"
+  },
+  {
+    "date": "2017-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2005254113417741521322614415,
+    "relativeRank": 1,
+    "comment": "VOO.US return 20.05 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1105428259683578832515002728,
+    "relativeRank": 1,
+    "comment": "VOO.US return 11.05 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0794906496062992125984251969,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.95 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0457303509639149777558082056,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.57 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1544001875984054135539847911,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.44 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1256414111371851774380159887,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.56 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-07-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0537694997886948692664343331,
+    "relativeRank": 1,
+    "comment": "VOO.US return 5.38 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0400060168848832034897932323,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0166733245244753095903881019,
+    "relativeRank": 1,
+    "comment": "VOO.US return 1.67 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-04-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0016510494637169559083544335,
+    "relativeRank": 1,
+    "comment": "VOO.US return 0.17 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0177727501256913021618903972,
+    "relativeRank": 1,
+    "comment": "VOO.US return 1.78 % =\u003E risk-on"
+  },
+  {
+    "date": "2016-02-29",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0623820747421883216104027863,
+    "relativeRank": 1,
+    "comment": "VOO.US return -6.24 % =\u003E risk-off"
+  },
+  {
+    "date": "2016-01-29",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0202995587893799829708181748,
+    "relativeRank": 1,
+    "comment": "VOO.US return -2.03 % =\u003E risk-off"
+  },
+  {
+    "date": "2015-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0133285119772634997969955339,
+    "relativeRank": 1,
+    "comment": "VOO.US return 1.33 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0281839801649547133532358448,
+    "relativeRank": 1,
+    "comment": "VOO.US return 2.82 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-10-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0636102549273466919907203554,
+    "relativeRank": 1,
+    "comment": "VOO.US return 6.36 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-09-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0066289076279026429108624901,
+    "relativeRank": 1,
+    "comment": "VOO.US return -0.66 % =\u003E risk-off"
+  },
+  {
+    "date": "2015-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.004023101660431843538754348,
+    "relativeRank": 1,
+    "comment": "VOO.US return 0.40 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.112680190018565032215791198,
+    "relativeRank": 1,
+    "comment": "VOO.US return 11.27 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0737956469653937786870903046,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.38 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-05-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1193085278356756161820445618,
+    "relativeRank": 1,
+    "comment": "VOO.US return 11.93 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1294856837636872215116033904,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.95 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1264255527003206829910591034,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.64 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-02-27",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1569827364081422313836640041,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.70 % =\u003E risk-on"
+  },
+  {
+    "date": "2015-01-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1360138329214625494430468048,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.60 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1357017802978450542879168858,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.57 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-11-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1674912495754013380396095169,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.75 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1720524283527413691994851603,
+    "relativeRank": 1,
+    "comment": "VOO.US return 17.21 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1954854314858134020782610079,
+    "relativeRank": 1,
+    "comment": "VOO.US return 19.55 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-08-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2479626520332527949547483517,
+    "relativeRank": 1,
+    "comment": "VOO.US return 24.80 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1683106734181252741118775168,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.83 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.247186012741633581507004541,
+    "relativeRank": 1,
+    "comment": "VOO.US return 24.72 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-05-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1858918998191269207580374456,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.59 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2039973599147049366210292948,
+    "relativeRank": 1,
+    "comment": "VOO.US return 20.40 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2199863544896320030400124364,
+    "relativeRank": 1,
+    "comment": "VOO.US return 22.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2534618724097496352390415067,
+    "relativeRank": 1,
+    "comment": "VOO.US return 25.35 % =\u003E risk-on"
+  },
+  {
+    "date": "2014-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2143977799341598120924664678,
+    "relativeRank": 1,
+    "comment": "VOO.US return 21.44 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.324108258683685832307795045,
+    "relativeRank": 1,
+    "comment": "VOO.US return 32.41 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-11-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2968752997141925459881457043,
+    "relativeRank": 1,
+    "comment": "VOO.US return 29.69 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2676726718028925061306455039,
+    "relativeRank": 1,
+    "comment": "VOO.US return 26.77 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1893032542558929568401828212,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.93 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-08-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1860369810216129189637507928,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.60 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2479102814154360546113123433,
+    "relativeRank": 1,
+    "comment": "VOO.US return 24.79 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-06-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2297759014007452749362593805,
+    "relativeRank": 1,
+    "comment": "VOO.US return 22.98 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2684393310879677204226208702,
+    "relativeRank": 1,
+    "comment": "VOO.US return 26.84 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.165233681719581936501676198,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.52 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-03-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1356538967025638007807136272,
+    "relativeRank": 1,
+    "comment": "VOO.US return 13.57 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1241679454604915599607557043,
+    "relativeRank": 1,
+    "comment": "VOO.US return 12.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2013-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1637383327493551614523748211,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.37 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-12-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VEU.US",
+        "name": "Ex-US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1748316405387502759991168028,
+    "relativeRank": 1,
+    "comment": "VEU.US return 17.48 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1610167507716591256424919156,
+    "relativeRank": 1,
+    "comment": "VOO.US return 16.10 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1510303687635574837310195228,
+    "relativeRank": 1,
+    "comment": "VOO.US return 15.10 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-09-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.278950572385356520013215875,
+    "relativeRank": 1,
+    "comment": "VOO.US return 27.90 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1812379407574294111304084484,
+    "relativeRank": 1,
+    "comment": "VOO.US return 18.12 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0892261001517450682852807284,
+    "relativeRank": 1,
+    "comment": "VOO.US return 8.92 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-06-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0644779914122239681699204891,
+    "relativeRank": 1,
+    "comment": "VOO.US return 6.45 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-05-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "AGG.US",
+        "name": "Bonds",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0045541323819375364680266087,
+    "relativeRank": 1,
+    "comment": "VOO.US return -0.46 % =\u003E risk-off"
+  },
+  {
+    "date": "2012-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0464861919954434204063775605,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.65 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-03-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0827843754076748401384317922,
+    "relativeRank": 1,
+    "comment": "VOO.US return 8.28 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-02-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0496169463406240806021796831,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.96 % =\u003E risk-on"
+  },
+  {
+    "date": "2012-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.041078431049391465240947242,
+    "relativeRank": 1,
+    "comment": "VOO.US return 4.11 % =\u003E risk-on"
+  },
+  {
+    "date": "2011-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0200091988561031261491541663,
+    "relativeRank": 1,
+    "comment": "VOO.US return 2.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2011-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0724132654647001020898534162,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.24 % =\u003E risk-on"
+  },
+  {
+    "date": "2011-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0746985937360045382617263309,
+    "relativeRank": 1,
+    "comment": "VOO.US return 7.47 % =\u003E risk-on"
+  },
+  {
+    "date": "2011-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "VOO.US",
+        "name": "US Equity",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0067601479673083953478285116,
+    "relativeRank": 1,
+    "comment": "VOO.US return 0.68 % =\u003E risk-on"
+  }
+]

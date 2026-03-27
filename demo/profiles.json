@@ -1,0 +1,28 @@
+{
+  "profiles": [
+    {
+      "id": "us",
+      "title": "US demo",
+      "signalsPath": "us.signals.json",
+      "windowMonths": 2,
+      "lastSignalDate": "2024-05-31",
+      "isRiskOn": true
+    },
+    {
+      "id": "eu",
+      "title": "EU demo",
+      "signalsPath": "eu.signals.json",
+      "windowMonths": 2,
+      "lastSignalDate": "2024-04-30",
+      "isRiskOn": true
+    },
+    {
+      "id": "pl",
+      "title": "PL demo",
+      "signalsPath": "pl.signals.json",
+      "windowMonths": 2,
+      "lastSignalDate": "2024-03-29",
+      "isRiskOn": true
+    }
+  ]
+}

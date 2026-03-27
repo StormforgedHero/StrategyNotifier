@@ -1,0 +1,28 @@
+{
+  "profiles": [
+    {
+      "id": "eu",
+      "title": "EU - SPPW.DE / IS3N.DE / EUNA.DE",
+      "signalsPath": "eu.signals.json",
+      "windowMonths": 12,
+      "lastSignalDate": "2026-03-26",
+      "isRiskOn": true
+    },
+    {
+      "id": "pl",
+      "title": "PL - ETFBW20TR.PL / ETFBM40TR.PL / ETFBCASH.PL",
+      "signalsPath": "pl.signals.json",
+      "windowMonths": 12,
+      "lastSignalDate": "2026-03-27",
+      "isRiskOn": true
+    },
+    {
+      "id": "us",
+      "title": "US - VOO.US / VEU.US / AGG.US",
+      "signalsPath": "us.signals.json",
+      "windowMonths": 12,
+      "lastSignalDate": "2026-03-27",
+      "isRiskOn": true
+    }
+  ]
+}

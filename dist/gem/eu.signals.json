@@ -1,0 +1,1052 @@
+[
+  {
+    "date": "2026-03-26",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.201204381770864855050535617,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 20.12 % =\u003E risk-on"
+  },
+  {
+    "date": "2026-02-27",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2773084508285991817031171813,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 27.73 % =\u003E risk-on"
+  },
+  {
+    "date": "2026-01-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2341646634615384615384615385,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 23.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1713962794391666921220637199,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 17.14 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-11-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1703815291911335198450518031,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 17.04 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1936078672403196066379840197,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 19.36 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1137724550898203592814371257,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 11.38 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-08-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.103615604186489058039961941,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 10.36 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1017523700086182131571387532,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 10.18 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0526618705035971223021582734,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 5.27 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-05-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0896064884349654550916191048,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 8.96 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0437404346495255586164677074,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 4.37 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0685099337748344370860927152,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 6.85 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2020274485339987523393636931,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 20.20 % =\u003E risk-on"
+  },
+  {
+    "date": "2025-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2742663656884875846501128668,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 27.43 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2609333333333333333333333333,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 26.09 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-11-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3349843041506801534705266829,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 33.50 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.310297903641044501655020228,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 31.03 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2491302804401845935392261271,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 24.91 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-08-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.22167487684729064039408867,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 22.17 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2095205003474635163307852675,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 20.95 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-06-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2504498020870816840590140338,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 25.04 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2221771067882322542541803551,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 22.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2349272349272349272349272349,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 23.49 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-03-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2989843172354749581663229171,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 29.90 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-02-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2202437450168950985231026235,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 22.02 % =\u003E risk-on"
+  },
+  {
+    "date": "2024-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1851710300019109497420217848,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 18.52 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-12-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1940773762139786658175449769,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 19.41 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0880985675951472088892248384,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 8.81 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-10-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0391942535915053091817613991,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 3.92 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-09-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1230714029422317904556871188,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 12.31 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0711081202332884701659937192,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 7.11 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-07-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0571166207529843893480257117,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 5.71 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1367034388006627065906978624,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 13.67 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0264075168598923997878305676,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 2.64 % =\u003E risk-on"
+  },
+  {
+    "date": "2023-04-28",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0298151679624468241161801379,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -2.98 % =\u003E risk-off"
+  },
+  {
+    "date": "2023-03-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0602259363529453690174975945,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -6.02 % =\u003E risk-off"
+  },
+  {
+    "date": "2023-02-28",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0163573215819546625835605184,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -1.64 % =\u003E risk-off"
+  },
+  {
+    "date": "2023-01-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0429423168367533560115585793,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -4.29 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-12-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.1328420979458482499739320844,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -13.28 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-11-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0465225225225225225225225225,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -4.65 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-10-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0411565984961313523920229576,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -4.12 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-09-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0364712621729998090509833874,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -3.65 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0029622408039296561550864299,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 0.30 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-07-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0467128027681660899653979239,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 4.67 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-06-30",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0261304159615914367793475267,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -2.61 % =\u003E risk-off"
+  },
+  {
+    "date": "2022-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0874706439784104486836141898,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 8.75 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-04-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1263023514392785075979080015,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 12.63 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1742478135330794660417625643,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 17.42 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-02-28",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1899831126122122478001955382,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 19.00 % =\u003E risk-on"
+  },
+  {
+    "date": "2022-01-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.2528182568050591146549353863,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 25.28 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3266473002259418084566791165,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 32.66 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3019611522942666791780050671,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 30.20 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-10-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.4018229962317954985232712089,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 40.18 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3085303083304182699515266603,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 30.85 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3171177400237060450414855788,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 31.71 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-07-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3480818281193066472333558899,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 34.81 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3546078635323486582067817766,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 35.46 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-05-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3999465550260544247984679107,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 39.99 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-04-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.3779583186153302719886965736,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 37.80 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-03-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.5035888601780074648291702555,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 50.36 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-02-26",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1821806471400092010427848489,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 18.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2021-01-29",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.1322289381389448548615774942,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 13.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-12-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0707078146866023421963614937,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 7.07 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-11-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0921944150706928288881055888,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 9.22 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-10-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "IS3N.DE",
+        "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0249505733491498616053776196,
+    "relativeRank": 1,
+    "comment": "IS3N.DE return 2.50 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-09-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0302203459637561779242174629,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 3.02 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-08-31",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0752768115557207721515626245,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 7.53 % =\u003E risk-on"
+  },
+  {
+    "date": "2020-07-31",
+    "windowMonths": 12,
+    "isRiskOn": false,
+    "allocations": [
+      {
+        "ticker": "EUNA.DE",
+        "name": "iShares Core Global Aggregate Bond UCITS ETF EUR Hedged Acc",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": -0.0017234625930278104191147669,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return -0.17 % =\u003E risk-off"
+  },
+  {
+    "date": "2020-06-30",
+    "windowMonths": 12,
+    "isRiskOn": true,
+    "allocations": [
+      {
+        "ticker": "SPPW.DE",
+        "name": "SPDR MSCI World UCITS ETF",
+        "weight": 1
+      }
+    ],
+    "absoluteReturn": 0.0375652927007496819940999756,
+    "relativeRank": 1,
+    "comment": "SPPW.DE return 3.76 % =\u003E risk-on"
+  }
+]

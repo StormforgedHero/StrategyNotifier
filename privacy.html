@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GEM Signals - Privacy Policy</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .privacy-page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .privacy-page h1 {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .privacy-page h2 {
+      margin-top: 22px;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .privacy-page p,
+    .privacy-page ul {
+      color: var(--muted);
+    }
+    .privacy-page ul {
+      padding-left: 18px;
+    }
+    .privacy-page a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="page privacy-page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="dot" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow">GEM</p>
+          <h1>
+            <span data-lang="en">GEM Signals</span>
+            <span data-lang="pl" class="hidden">Sygnały GEM</span>
+          </h1>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <label class="sr-only" for="lang-select">Language / Język</label>
+        <select id="lang-select" class="lang-select" aria-label="Select language">
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+        </select>
+      </div>
+    </header>
+
+    <div data-lang="en">
+      <h1>Privacy Policy</h1>
+      <p>The Strategy Notifier project operates this static site and related email notifications.</p>
+
+      <h2>Data processed</h2>
+      <ul>
+        <li>Email address.</li>
+        <li>Selected portfolios and scheduling preferences submitted via the Google Form.</li>
+        <li>Technical markers about sends (e.g., month of last send) stored in the spreadsheet.</li>
+      </ul>
+
+      <h2>Purpose and legal basis</h2>
+      <p>Purpose: sending email notifications with portfolio signals chosen by the user. Legal basis: your consent provided in the form.</p>
+
+      <h2>Retention</h2>
+      <p>Data is kept until you unsubscribe or request deletion. Monthly markers remain for anti-duplication.</p>
+
+      <h2>Sharing and hosting</h2>
+      <p>No data is shared with third parties beyond the infrastructure used to deliver the service (Google Sheets/Apps Script for automation and GitHub Pages for hosting this static site).</p>
+
+      <h2>Links</h2>
+      <p><a id="back-link-en" href="./?lang=en">Back to the main page</a></p>
+    </div>
+
+    <div data-lang="pl" class="hidden">
+      <h1>Polityka prywatności</h1>
+      <p>Projekt Strategy Notifier prowadzi tę statyczną stronę oraz powiązane powiadomienia e-mail.</p>
+
+      <h2>Zakres danych</h2>
+      <ul>
+        <li>Adres e-mail.</li>
+        <li>Wybrane portfolia oraz preferencje harmonogramu przekazane w formularzu Google.</li>
+        <li>Techniczne znaczniki wysyłek (np. miesiąc ostatniej wysyłki) przechowywane w arkuszu.</li>
+      </ul>
+
+      <h2>Cel i podstawa</h2>
+      <p>Cel: wysyłka powiadomień e-mail z sygnałami portfeli wybranych przez użytkownika. Podstawa: zgoda wyrażona w formularzu.</p>
+
+      <h2>Okres przechowywania</h2>
+      <p>Dane są przechowywane do czasu wypisu lub żądania usunięcia. Miesięczne znaczniki pozostają na potrzeby antyduplikacji.</p>
+
+      <h2>Udostępnianie i hosting</h2>
+      <p>Brak udostępniania osobom trzecim poza infrastrukturą niezbędną do świadczenia usługi (Google Sheets/Apps Script do automatyzacji oraz GitHub Pages do hostingu tej statycznej strony).</p>
+
+      <h2>Linki</h2>
+      <p><a id="back-link-pl" href="./?lang=pl">Powrót na stronę główną</a></p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var LANG_KEY = 'sn_language';
+      var supported = { en: true, pl: true };
+
+      function getLangFromUrl() {
+        var params = new URLSearchParams(window.location.search);
+        var lang = (params.get('lang') || '').toLowerCase();
+        return supported[lang] ? lang : null;
+      }
+
+      function detectLang() {
+        var fromUrl = getLangFromUrl();
+        if (fromUrl) return fromUrl;
+        var stored = window.localStorage.getItem(LANG_KEY);
+        if (stored && supported[stored]) return stored;
+        var browser = (navigator.language || navigator.userLanguage || '').slice(0, 2).toLowerCase();
+        return supported[browser] ? browser : 'en';
+      }
+
+      function updateUrl(lang) {
+        var params = new URLSearchParams(window.location.search);
+        params.set('lang', lang);
+        var newUrl = window.location.pathname + '?' + params.toString();
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      function applyLang(lang) {
+        if (!supported[lang]) {
+          lang = 'en';
+        }
+        document.documentElement.lang = lang;
+        window.localStorage.setItem(LANG_KEY, lang);
+        updateUrl(lang);
+
+        var select = document.getElementById('lang-select');
+        if (select && select.value !== lang) {
+          select.value = lang;
+        }
+
+        var blocks = document.querySelectorAll('[data-lang]');
+        blocks.forEach(function (block) {
+          block.classList.toggle('hidden', block.getAttribute('data-lang') !== lang);
+        });
+
+        var backEn = document.getElementById('back-link-en');
+        var backPl = document.getElementById('back-link-pl');
+        if (backEn) backEn.href = './?lang=' + encodeURIComponent(lang);
+        if (backPl) backPl.href = './?lang=' + encodeURIComponent(lang);
+
+        document.title = lang === 'pl'
+          ? 'Sygnały GEM - Polityka prywatności'
+          : 'GEM Signals - Privacy Policy';
+      }
+
+      var initialLang = detectLang();
+      applyLang(initialLang);
+
+      var select = document.getElementById('lang-select');
+      if (select) {
+        select.addEventListener('change', function (e) {
+          applyLang(e.target.value);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
